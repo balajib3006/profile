@@ -1,28 +1,33 @@
 name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [ main ]
 
 permissions:
-  contents: write  # This is crucial for pushing to gh-pages branch
+  contents: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Important for peaceiris/actions-gh-pages
 
-      # Create symlink structure
-      - name: Setup assets
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare public directory
         run: |
           mkdir -p public/assets
-          ln -sf $(pwd)/src/assets/contact.vcf public/assets/
+          cp src/assets/contact.vcf public/assets/
+          touch public/.nojekyll  # Ensure GitHub Pages processes everything
 
-      # Deploy to gh-pages
-      - uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
           publish_dir: ./public
-          keep_files: true  # Preserve existing files in gh-pages
+          user_name: balajib3006
+          user_email: 59250390+balajib3006@users.noreply.github.com
