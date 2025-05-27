@@ -14,11 +14,11 @@ jobs:
         with:
           fetch-depth: 0  # Important for peaceiris/actions-gh-pages
 
-      # Copy contact.vcf to public/assets
+      # Create symlink structure
       - name: Setup assets
         run: |
           mkdir -p public/assets
-          cp src/assets/contact.vcf public/assets/
+          ln -sf $(pwd)/src/assets/contact.vcf public/assets/
 
       # Deploy to gh-pages
       - uses: peaceiris/actions-gh-pages@v3
