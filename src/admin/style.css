@@ -1,0 +1,233 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background: #35424a;
+    color: #ffffff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.admin-container {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-sidebar {
+    width: 150px;
+    float: left;
+    background: #408ebf;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    height: relative;
+    position: relative;
+}
+
+.admin-main {
+    margin-left: 150px;
+    padding: 20px;
+}
+
+.admin-form {
+    display: block;
+    gap: 15px;
+    width: 240px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.admin-form input[type="text"], .admin-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.admin-form button {
+    padding: 10px;
+    background-color: #408ebf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.admin-form button:hover {
+    background-color: #357abf;
+}
+
+.experience-section {
+    display: block;
+    gap: 15px;
+    width: 240px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.experience-section input[type="text"], .experience-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.experience-section button {
+    padding: 10px;
+    background-color: #408ebf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.experience-section button:hover {
+    background-color: #357abf;
+}
+
+.education-section {
+    display: block;
+    gap: 15px;
+    width: 240px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.education-section input[type="text"], .education-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.education-section button {
+    padding: 10px;
+    background-color: #408ebf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.education-section button:hover {
+    background-color: #357abf;
+}
+
+.publication-section {
+    display: block;
+    gap: 15px;
+    width: 240px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.publication-section input[type="text"], .publication-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.publication-section button {
+    padding: 10px;
+    background-color: #408ebf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.publication-section button:hover {
+    background-color: #357abf;
+}
+
+.certification-section {
+    display: block;
+    gap: 15px;
+    width: 240px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.certification-section input[type="text"], .certification-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.certification-section button {
+    padding: 10px;
+    background-color: #408ebf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.certification-section button:hover {
+    background-color: #357abf;
+}
+
+.portfolio-section {
+    display: block;
+    gap: 15px;
+    width: 240px;
+    padding: 20px;
+    margin-top: 10px;
+}
+.portfolio-section input[type="text"], .portfolio-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+.portfolio-section button {
+    padding: 10px;
+    background-color: #408ebf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.portfolio-section button:hover {
+    background-color: #357abf;
+}
+
+.admin-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.admin-actions button {
+    padding: 10px;
+    background-color: #408ebf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.admin-actions button:hover {
+    background-color: #357abf;
+}
