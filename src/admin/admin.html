@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Professional profile of Balaji B, Associate Engineer">
+  <title>Profile Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-sidebar">
+            <ul>
+                <li class="active" data-section="personal">Personal Info</li>
+                <li data-section="experience">Experience</li>
+                <li data-section="education">Education</li>
+                <li data-section="publications">Publications</li>
+                <li data-section="certifications">Certifications</li>
+                <li data-section="portfolio">Portfolio</li>
+            </ul>
+        </nav>
+
+        <main class="admin-main">
+            <section id="personal-section" class="edit-section active">
+                <h2>Personal Information</h2>
+                <form id="personal-form" class="admin-form">                
+                    <div class="form-group">
+                        <label for="title">Professional Title</label>
+                        <input type="text" id="title" required="">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="summary">Professional Summary</label>
+                        <textarea id="summary" rows="5" required=""></textarea>
+                    </div>
+                </form>
+            </section>
+
+            <section id="experience-section" class="experience-section">
+                <h2>Experience</h2>
+                <div id="experience-list" class="item-list">
+                    <!-- Dynamic items will appear here -->
+                </div>
+                
+                <div class="experience-form template" id="experience-template">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Position</label>
+                        <input type="text" class="exp-position" required="">
+                    </div>
+                    <div class="form-group">
+                        <label>Company</label>
+                        <input type="text" class="exp-company" required="">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Duration</label>
+                        <input type="text" class="exp-duration" placeholder="e.g. 2020 - Present">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="exp-description" rows="4"></textarea>
+                </div>
+                
+                <div class="item-actions">
+                    <button type="button" id="remove" class="remove-btn">Remove</button>
+                    <button id="add-experience" class="add-item-btn">Add Experience</button>
+                </div>
+                </div>
+            </section>
+
+            <section id="education-section" class="education-section">
+                <h2>Education</h2>
+                    <div id="education-list" class="item-list">
+                        <!-- Dynamic items will appear here -->
+                    </div>
+                
+                <div class="education-form template" id="education-template">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Degree</label>
+                            <input type="text" class="edu-degree" required="">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="publications-section" class="publications-section">
+                <h2>Publications</h2>
+                <div id="publication-list" class="item-list">
+                    <!-- Dynamic items will appear here -->
+                </div>
+                
+                <div class="publication-form template" id="publication-template">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" class="pub-title" required="">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="certifications-section" class="certifications-section">
+                <h2>Certifications</h2>
+                <div id="certification-list" class="item-list">
+                    <!-- Dynamic items will appear here -->
+                </div>
+                
+                <div class="certification-form template" id="certification-template">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Certification</label>
+                            <input type="text" class="cert-name" required="">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="portfolio-section" class="portfolio-section">
+                <h2>Portfolio</h2>
+                <div id="portfolio-list" class="item-list">
+                    <!-- Dynamic items will appear here -->
+                </div>
+                
+                <div class="portfolio-form template" id="portfolio-template">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Project Title</label>
+                            <input type="text" class="proj-title" required="">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="admin-actions">
+                <button type="button" id="save-all" class="save-btn">Save All Changes</button>
+                <button id="preview">Preview Changes</button>
+            </div>
+        </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
