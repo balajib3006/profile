@@ -1,0 +1,230 @@
+/* Background */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(-45deg, #0d1117, #161b22, #1e242c, #0d1117);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 1rem;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Card */
+.card {
+  background: rgba(30, 36, 44, 0.95);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  color: #e6edf3;
+  backdrop-filter: blur(8px);
+}
+
+.card img.logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 3px solid #00bcd4;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #00bcd4;
+}
+
+h2 {
+  font-size: 1rem;
+  font-weight: normal;
+  color: #8b949e;
+  margin: 0.3rem 0 1rem;
+}
+
+/* Buttons */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.btn {
+  border: 1px solid #00bcd4;
+  border-radius: 25px;
+  padding: 8px 16px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: #00bcd4;
+  color: #0d1117;
+  box-shadow: 0 0 12px rgba(0,188,212,0.7);
+}
+
+/* Info */
+.info {
+  text-align: left;
+  margin: 1.5rem 0;
+}
+
+.info p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #c9d1d9;
+}
+
+.info a {
+  color: #00bcd4;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.info a:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 8px rgba(0,188,212,0.7);
+}
+
+/* Action Buttons */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  background: #2b3c55;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.action-btn:hover {
+  background: #00bcd4;
+  color: #0d1117;
+  box-shadow: 0 0 12px rgba(0,188,212,0.7);
+}
+
+/* QR */
+.qr {
+  margin-top: 2rem;
+}
+
+.qr img {
+  width: 150px;
+  border: 3px solid #00bcd4;
+  border-radius: 12px;
+  padding: 8px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.qr img:hover {
+  box-shadow: 0 0 15px rgba(0,188,212,0.8);
+  transform: scale(1.05);
+}
+
+.qr p {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .card {
+    padding: 1.2rem;
+    border-radius: 15px;
+  }
+  h1 { font-size: 1.3rem; }
+  h2 { font-size: 0.9rem; }
+  .btn { flex: 1 1 100%; text-align: center; }
+  .btn-row { flex-direction: column; gap: 8px; }
+  .action-btn { font-size: 0.85rem; padding: 8px; }
+  .qr img { width: 120px; }
+}
+
+/* FAB - Save Contact */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #00bcd4;
+  color: #0d1117;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.6);
+  display: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.fab:hover {
+  background: #00a3bb;
+  box-shadow: 0 6px 16px rgba(0, 188, 212, 0.8);
+  transform: scale(1.05);
+}
+
+/* FAB - WhatsApp */
+.fab-whatsapp {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #25d366;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  text-align: center;
+  line-height: 60px;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.6);
+  text-decoration: none;
+  display: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.fab-whatsapp:hover {
+  background: #1ebe5b;
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.8);
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .fab, .fab-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
