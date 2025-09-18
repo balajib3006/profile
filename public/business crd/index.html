@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balaji B - Digital Business Card</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <!-- Logo / Avatar -->
+    <div class="hero-image">
+      <div class="image-container">
+        <img src="profile-photo.jpg" alt="Balaji B - Associate Engineer" class="profile-photo">
+        <div class="image-decoration"></div>
+      </div>
+    </div>
+
+    <!-- Name + Title -->
+    <h1>Balaji B</h1>
+    <h2>Associate Engineer<br>Rangsons Aerospace Pvt Ltd</h2>
+
+    <!-- Quick Buttons -->
+    <div class="btn-row">
+      <a href="tel:+919159875082" class="btn">📞 Call</a>
+      <a href="https://wa.me/919159875082" class="btn">💬 WhatsApp</a>
+      <a href="mailto:balajib@rangsonsaerospace.com" class="btn">✉️ Mail</a>
+      <a href="https://balajib3006.github.io/profile/public/index.html" class="btn">🌐 Website</a>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="info">
+      <p>📞 +91 9159875082</p>
+      <p>📧 balaji3006@outlook.in</p>
+      <p>📧 balajib@rangsonsaerospace.com</p>
+      <p>📍 Bengaluru, Karnataka, 5600278, India</p>
+      <p>🔗 <a href="https://www.linkedin.com/in/balajib300602" target="_blank">LinkedIn</a></p>
+      <p>🔗 <a href="https://github.com/balajib3006" target="_blank">GitHub</a></p>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="actions">
+      <button class="action-btn" onclick="downloadVCard()">Save to Contacts</button>
+      <button class="action-btn" onclick="shareCard()">Share</button>
+    </div>
+
+    <!-- QR Code -->
+    <div class="qr">
+      <img id="qrCode" alt="QR Code">
+      <p>Scan to Save Contact</p>
+    </div>
+  </div>
+
+  <!-- Floating Save Contact FAB -->
+  <button class="fab" onclick="downloadVCard()">💾</button>
+
+  <!-- Floating WhatsApp FAB -->
+  <a href="https://wa.me/919159875082" class="fab-whatsapp" target="_blank">💬</a>
+
+  <script src="script.js"></script>
+</body>
+</html>
