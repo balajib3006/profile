@@ -173,6 +173,7 @@ class MobileNavigationManager {
     this.mobileToggle = null;
     this.navMenu = document.getElementById('nav-menu');
     this.navOverlay = null;
+    this.mobileFabContainer = null;
     this.isOpen = false;
     this.init();
   }
@@ -180,8 +181,74 @@ class MobileNavigationManager {
   init() {
     this.createMobileToggle();
     this.createOverlay();
+    this.createMobileFAB();
     this.bindEvents();
     console.log('Mobile Navigation Manager initialized');
+  }
+
+  createMobileFAB() {
+    // Remove existing FAB container if any
+    const existingFAB = document.querySelector('.mobile-fab-container');
+    if (existingFAB) {
+      existingFAB.remove();
+    }
+
+    // Create mobile FAB container
+    this.mobileFabContainer = document.createElement('div');
+    this.mobileFabContainer.className = 'mobile-fab-container';
+    
+    // Get the original nav-actions content
+    const originalNavActions = document.querySelector('.nav-actions');
+    if (originalNavActions) {
+      // Clone social icons
+      const socialIcons = originalNavActions.querySelector('.social-icons');
+      if (socialIcons) {
+        const socialLinks = socialIcons.querySelectorAll('.social-link');
+        socialLinks.forEach(link => {
+          const fabButton = document.createElement('a');
+          fabButton.href = link.href;
+          fabButton.target = link.target;
+          fabButton.className = 'fab-button';
+          fabButton.setAttribute('aria-label', link.getAttribute('aria-label'));
+          fabButton.innerHTML = link.innerHTML;
+          this.mobileFabContainer.appendChild(fabButton);
+        });
+      }
+
+      // Clone action buttons
+      const actionButtons = originalNavActions.querySelectorAll('.action-btn');
+      actionButtons.forEach(button => {
+        const fabButton = document.createElement('button');
+        fabButton.className = 'fab-button';
+        fabButton.id = button.id;
+        fabButton.setAttribute('aria-label', button.getAttribute('aria-label'));
+        fabButton.innerHTML = button.innerHTML;
+        
+        // Copy event listeners for theme toggle
+        if (button.id === 'theme-toggle') {
+          fabButton.addEventListener('click', () => {
+            window.themeManager?.toggleTheme();
+          });
+        }
+        
+        // Handle download button
+        if (button.hasAttribute('download')) {
+          const downloadLink = document.createElement('a');
+          downloadLink.href = button.closest('a')?.href || '#';
+          downloadLink.download = button.closest('a')?.download || '';
+          downloadLink.className = 'fab-button';
+          downloadLink.setAttribute('aria-label', button.getAttribute('aria-label'));
+          downloadLink.innerHTML = button.innerHTML;
+          this.mobileFabContainer.appendChild(downloadLink);
+        } else {
+          this.mobileFabContainer.appendChild(fabButton);
+        }
+      });
+    }
+
+    // Add to body
+    document.body.appendChild(this.mobileFabContainer);
+    console.log('Mobile FAB container created with buttons:', this.mobileFabContainer.children.length);
   }
 
   createMobileToggle() {
@@ -547,14 +614,19 @@ class ThemeManager {
 class AnimationManager {
   constructor() {
     this.observerOptions = {
-      threshold: Utils.isMobile() ? 0.05 : 0.1,
-      rootMargin: Utils.isMobile() ? '0px 0px -20px 0px' : '0px 0px -50px 0px'
+      threshold: Utils.isMobile() ? 0.1 : 0.15,
+      rootMargin: Utils.isMobile() ? '0px 0px -10px 0px' : '0px 0px -50px 0px'
+    };
+    this.headerObserverOptions = {
+      threshold: 0.2,
+      rootMargin: Utils.isMobile() ? '0px 0px -30px 0px' : '0px 0px -50px 0px'
     };
     this.init();
   }
 
   init() {
     this.setupIntersectionObserver();
+    this.setupHeaderAnimations();
     this.setupSkillBarAnimations();
     this.setupCounterAnimations();
     this.setupTypewriterEffect();
@@ -564,7 +636,7 @@ class AnimationManager {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-          const delay = Utils.isMobile() ? index * 50 : index * 100;
+          const delay = Utils.isMobile() ? index * 30 : index * 100;
           setTimeout(() => {
             entry.target.classList.add('visible');
             this.triggerElementAnimation(entry.target);
@@ -582,6 +654,22 @@ class AnimationManager {
     animatedElements.forEach(element => {
       element.classList.add('fade-in');
       observer.observe(element);
+    });
+  }
+
+  setupHeaderAnimations() {
+    const headerObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          headerObserver.unobserve(entry.target);
+        }
+      });
+    }, this.headerObserverOptions);
+
+    const sectionHeaders = document.querySelectorAll('.section-header');
+    sectionHeaders.forEach(header => {
+      headerObserver.observe(header);
     });
   }
 
@@ -694,13 +782,23 @@ class PortfolioManager {
   }
 
   setupPortfolioHoverEffects() {
-    if (Utils.isMobile()) return; // Disable hover effects on mobile
-
     const portfolioItems = document.querySelectorAll('.portfolio-item');
     
+    // Add subtle floating animation to portfolio items
+    portfolioItems.forEach((item, index) => {
+      // Add staggered floating animation
+      setTimeout(() => {
+        item.classList.add('animate-float');
+      }, index * 200);
+    });
+
+    if (Utils.isMobile()) return; // Disable hover effects on mobile
+
     portfolioItems.forEach(item => {
       item.addEventListener('mouseenter', (e) => {
         this.createHoverEffect(e.target);
+        // Remove floating animation on hover for better interaction
+        e.target.classList.remove('animate-float');
       });
       
       item.addEventListener('mousemove', (e) => {
@@ -709,6 +807,10 @@ class PortfolioManager {
       
       item.addEventListener('mouseleave', (e) => {
         this.removeHoverEffect(e.target);
+        // Re-add floating animation after hover
+        setTimeout(() => {
+          e.target.classList.add('animate-float');
+        }, 500);
       });
     });
   }
