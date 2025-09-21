@@ -1,4 +1,4 @@
-# Professional Portfolio Website
+8# Professional Portfolio Website
 
 A modern, responsive portfolio website with a comprehensive admin panel for content management. Built with Flask, SQLite, and modern web technologies.
 
@@ -233,11 +233,7 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 2. Create a feature branch
 3. Make your changes
 4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
+5. Submit a pull 
 
 ## Support
 
