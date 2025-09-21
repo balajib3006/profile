@@ -1,0 +1,141 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+    <p>Welcome back! Here's an overview of your portfolio.</p>
+</div>
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-briefcase"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_experiences }}</h3>
+            <p>Experiences</p>
+        </div>
+        <a href="{{ url_for('admin_experiences') }}" class="stat-link">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-tools"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_skills }}</h3>
+            <p>Skills</p>
+        </div>
+        <a href="{{ url_for('admin_skills') }}" class="stat-link">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-folder"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_projects }}</h3>
+            <p>Projects</p>
+        </div>
+        <a href="{{ url_for('admin_projects') }}" class="stat-link">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-certificate"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_certifications }}</h3>
+            <p>Certifications</p>
+        </div>
+        <a href="{{ url_for('admin_certifications') }}" class="stat-link">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-envelope"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ unread_messages }}</h3>
+            <p>Unread Messages</p>
+        </div>
+        <a href="{{ url_for('admin_messages') }}" class="stat-link">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-content">
+    <div class="dashboard-section">
+        <h2><i class="fas fa-user"></i> Profile Overview</h2>
+        {% if profile %}
+        <div class="profile-overview">
+            <div class="profile-info">
+                <h3>{{ profile.name }}</h3>
+                <p class="profile-title">{{ profile.title }}</p>
+                <p class="profile-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ profile.location }}
+                </p>
+                <p class="profile-email">
+                    <i class="fas fa-envelope"></i>
+                    {{ profile.email }}
+                </p>
+            </div>
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <span class="stat-value">{{ profile.years_experience }}+</span>
+                    <span class="stat-label">Years Experience</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-value">{{ profile.projects_completed }}+</span>
+                    <span class="stat-label">Projects</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-value">{{ profile.companies_worked }}</span>
+                    <span class="stat-label">Companies</span>
+                </div>
+            </div>
+        </div>
+        <a href="{{ url_for('admin_profile') }}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i>
+            Edit Profile
+        </a>
+        {% else %}
+        <p>No profile information found. <a href="{{ url_for('admin_profile') }}">Create profile</a></p>
+        {% endif %}
+    </div>
+    
+    <div class="dashboard-section">
+        <h2><i class="fas fa-chart-line"></i> Quick Actions</h2>
+        <div class="quick-actions">
+            <a href="{{ url_for('admin_add_experience') }}" class="action-btn">
+                <i class="fas fa-plus"></i>
+                Add Experience
+            </a>
+            <a href="{{ url_for('admin_add_skill') }}" class="action-btn">
+                <i class="fas fa-plus"></i>
+                Add Skill
+            </a>
+            <a href="{{ url_for('admin_add_project') }}" class="action-btn">
+                <i class="fas fa-plus"></i>
+                Add Project
+            </a>
+            <a href="{{ url_for('admin_add_certification') }}" class="action-btn">
+                <i class="fas fa-plus"></i>
+                Add Certification
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

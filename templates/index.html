@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile.name }} - {{ profile.title }} | Professional Portfolio{% endblock %}
+{% block description %}{{ profile.description }}{% endblock %}
+{% block keywords %}{{ profile.name }}, {{ profile.title }}, Hardware Design, PCB Development, Antenna Design, Electronics{% endblock %}
+{% block author %}{{ profile.name }}{% endblock %}
+
+{% block og_title %}{{ profile.name }} - {{ profile.title }}{% endblock %}
+{% block og_description %}{{ profile.description }}{% endblock %}
+
+{% block content %}
+<!-- Parallax Background Elements -->
+<div class="parallax-bg">
+    <div class="parallax-layer parallax-layer-1"></div>
+    <div class="parallax-layer parallax-layer-2"></div>
+    <div class="parallax-layer parallax-layer-3"></div>
+</div>
+
+<!-- Floating Particles -->
+<div class="floating-particles"></div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<!-- Navigation -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <div class="nav-logo">
+            <span>{{ profile.name }}</span>
+        </div>
+        <div class="nav-menu" id="nav-menu">
+            <a href="#about" class="nav-link">About</a>
+            <a href="#experience" class="nav-link">Experience</a>
+            <a href="#skills" class="nav-link">Skills</a>
+            <a href="#portfolio" class="nav-link">Portfolio</a>
+            {% if certifications %}
+            <a href="#certifications" class="nav-link">Certifications</a>
+            {% endif %}
+            <a href="#contact" class="nav-link">Contact</a>
+        </div>
+        <div class="nav-actions">
+            <div class="social-icons">
+                {% if profile.github_url %}
+                <a href="{{ profile.github_url }}" target="_blank" aria-label="GitHub" class="social-link">
+                    <i class="fab fa-github"></i>
+                </a>
+                {% endif %}
+                {% if profile.orcid_url %}
+                <a href="{{ profile.orcid_url }}" target="_blank" aria-label="ORCID" class="social-link">
+                    <i class="fab fa-orcid"></i>
+                </a>
+                {% endif %}
+                {% if profile.linkedin_url %}
+                <a href="{{ profile.linkedin_url }}" target="_blank" aria-label="LinkedIn" class="social-link">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% if profile.resume_url %}
+            <a href="{{ profile.resume_url }}" class="action-btn" download aria-label="Download Resume">
+                <i class="fas fa-download"></i>
+            </a>
+            {% endif %}
+            <button id="theme-toggle" class="action-btn" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="title-line">Hi, I'm</span>
+                    <span class="title-name">{{ profile.name }}</span>
+                </h1>
+                <p class="hero-subtitle">{{ profile.title }}</p>
+                <p class="hero-description">{{ profile.description }}</p>
+                <div class="hero-actions">
+                    <a href="#contact" class="btn btn-primary">
+                        <i class="fas fa-envelope"></i>
+                        Get In Touch
+                    </a>
+                    <a href="#portfolio" class="btn btn-secondary">
+                        <i class="fas fa-briefcase"></i>
+                        View Portfolio
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='images/' + profile.profile_image) if profile.profile_image else url_for('static', filename='images/profile-photo.jpg') }}" 
+                         alt="{{ profile.name }} - {{ profile.title }}" class="profile-photo">
+                    <div class="image-decoration"></div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-arrow">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<main>
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">About Me</h2>
+                <p class="section-subtitle">Professional Summary</p>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>{{ profile.description }}</p>
+                </div>
+                <div class="about-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ profile.years_experience }}+</div>
+                        <div class="stat-label">Years Experience</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ profile.projects_completed }}+</div>
+                        <div class="stat-label">Projects Completed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ profile.companies_worked }}</div>
+                        <div class="stat-label">Companies</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Professional Experience</h2>
+                <p class="section-subtitle">My career journey</p>
+            </div>
+            <div class="timeline">
+                {% for experience in experiences %}
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <h3 class="job-title">{{ experience.job_title }}</h3>
+                            <span class="job-period">
+                                {{ experience.start_date }}{% if experience.end_date %} - {{ experience.end_date }}{% elif experience.is_current %} - Present{% endif %}
+                            </span>
+                        </div>
+                        <div class="company">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</div>
+                        {% if experience.description %}
+                        <p class="job-description">{{ experience.description }}</p>
+                        {% endif %}
+                        {% if experience.responsibilities %}
+                        <ul class="job-responsibilities">
+                            {% for responsibility in experience.responsibilities|from_json %}
+                            <li>{{ responsibility }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Technical Skills</h2>
+                <p class="section-subtitle">Technologies and tools I work with</p>
+            </div>
+            <div class="skills-grid">
+                {% for category, skills in skills_by_category.items() %}
+                <div class="skill-category">
+                    <h3 class="category-title">
+                        {% if skills[0].icon %}
+                        <i class="{{ skills[0].icon }}"></i>
+                        {% endif %}
+                        {{ category }}
+                    </h3>
+                    <div class="skills-list">
+                        {% for skill in skills %}
+                        <div class="skill-item">
+                            <span class="skill-name">{{ skill.name }}</span>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: {{ skill.proficiency }}%"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Portfolio</h2>
+                <p class="section-subtitle">Featured projects and designs</p>
+            </div>
+            <div class="portfolio-grid">
+                {% for project in projects %}
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        {% set images = project.images|from_json %}
+                        <img src="{{ images[0] if images else 'https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Project' }}" 
+                             alt="{{ project.title }}">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-actions">
+                                <button class="portfolio-btn" onclick="openPortfolioModal({{ project.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                {% if project.project_url %}
+                                <a href="{{ project.project_url }}" class="portfolio-btn" target="_blank">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                                {% endif %}
+                                {% if project.github_url %}
+                                <a href="{{ project.github_url }}" class="portfolio-btn" target="_blank">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">{{ project.title }}</h3>
+                        <p class="portfolio-description">{{ project.description }}</p>
+                        <div class="portfolio-tags">
+                            {% for tech in project.technologies|from_json %}
+                            <span class="tag">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section -->
+    {% if certifications %}
+    <section id="certifications" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Certifications</h2>
+                <p class="section-subtitle">Professional credentials and achievements</p>
+            </div>
+            <div class="certifications-grid">
+                {% for cert in certifications %}
+                <div class="certification-item">
+                    {% if cert.image %}
+                    <div class="certification-image">
+                        <img src="{{ cert.image }}" alt="{{ cert.name }}">
+                    </div>
+                    {% endif %}
+                    <div class="certification-content">
+                        <h3 class="certification-name">{{ cert.name }}</h3>
+                        <p class="certification-issuer">{{ cert.issuer }}</p>
+                        {% if cert.issue_date %}
+                        <p class="certification-date">Issued: {{ cert.issue_date }}</p>
+                        {% endif %}
+                        {% if cert.expiry_date %}
+                        <p class="certification-expiry">Expires: {{ cert.expiry_date }}</p>
+                        {% endif %}
+                        {% if cert.credential_url %}
+                        <a href="{{ cert.credential_url }}" target="_blank" class="certification-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Credential
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get In Touch</h2>
+                <p class="section-subtitle">Let's discuss your next project</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Email</h3>
+                            <p>{{ profile.email }}</p>
+                        </div>
+                    </div>
+                    {% if profile.location %}
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Location</h3>
+                            <p>{{ profile.location }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if profile.phone %}
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Phone</h3>
+                            <p>{{ profile.phone }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <form id="contact-form" class="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-text">
+                <p>&copy; 2024 {{ profile.name }}. All rights reserved.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#about">About</a>
+                <a href="#experience">Experience</a>
+                <a href="#skills">Skills</a>
+                <a href="#portfolio">Portfolio</a>
+                {% if certifications %}
+                <a href="#certifications">Certifications</a>
+                {% endif %}
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Portfolio Modal -->
+<div id="portfolio-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Portfolio data is loaded via API when needed
+</script>
+{% endblock %}

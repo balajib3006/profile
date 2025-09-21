@@ -1,0 +1,183 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Edit' if project else 'Add' }} Project - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>
+        <i class="fas fa-folder"></i>
+        {{ 'Edit Project' if project else 'Add New Project' }}
+    </h1>
+    <p>{{ 'Update the project details' if project else 'Add a new portfolio project' }}</p>
+</div>
+
+<div class="admin-content">
+    <form method="POST" class="admin-form">
+        <div class="form-section">
+            <h2>Basic Information</h2>
+            
+            <div class="form-group">
+                <label for="title">Project Title *</label>
+                <input type="text" id="title" name="title" 
+                       value="{{ project.title if project else '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Short Description *</label>
+                <textarea id="description" name="description" rows="3" required 
+                          placeholder="Brief description for the portfolio grid">{{ project.description if project else '' }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="detailed_description">Detailed Description</label>
+                <textarea id="detailed_description" name="detailed_description" rows="5" 
+                          placeholder="Detailed description for the project modal">{{ project.detailed_description if project else '' }}</textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Technologies</h2>
+            
+            <div class="dynamic-list" id="technologies-list">
+                {% if project and project.technologies %}
+                    {% for tech in project.technologies|from_json %}
+                    <div class="list-item">
+                        <input type="text" name="technologies[]" value="{{ tech }}" 
+                               placeholder="Enter a technology">
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="list-item">
+                        <input type="text" name="technologies[]" placeholder="Enter a technology">
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <button type="button" class="btn btn-secondary add-item" data-target="technologies-list">
+                <i class="fas fa-plus"></i>
+                Add Technology
+            </button>
+        </div>
+        
+        <div class="form-section">
+            <h2>Key Features</h2>
+            
+            <div class="dynamic-list" id="features-list">
+                {% if project and project.features %}
+                    {% for feature in project.features|from_json %}
+                    <div class="list-item">
+                        <input type="text" name="features[]" value="{{ feature }}" 
+                               placeholder="Enter a key feature">
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="list-item">
+                        <input type="text" name="features[]" placeholder="Enter a key feature">
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <button type="button" class="btn btn-secondary add-item" data-target="features-list">
+                <i class="fas fa-plus"></i>
+                Add Feature
+            </button>
+        </div>
+        
+        <div class="form-section">
+            <h2>Images</h2>
+            
+            <div class="dynamic-list" id="images-list">
+                {% if project and project.images %}
+                    {% for image in project.images|from_json %}
+                    <div class="list-item">
+                        <input type="url" name="images[]" value="{{ image }}" 
+                               placeholder="Enter image URL">
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="list-item">
+                        <input type="url" name="images[]" placeholder="Enter image URL">
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <button type="button" class="btn btn-secondary add-item" data-target="images-list">
+                <i class="fas fa-plus"></i>
+                Add Image
+            </button>
+        </div>
+        
+        <div class="form-section">
+            <h2>Links</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="project_url">Project URL</label>
+                    <input type="url" id="project_url" name="project_url" 
+                           value="{{ project.project_url if project else '' }}" 
+                           placeholder="https://example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="github_url">GitHub URL</label>
+                    <input type="url" id="github_url" name="github_url" 
+                           value="{{ project.github_url if project else '' }}" 
+                           placeholder="https://github.com/username/repo">
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Display Settings</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="is_featured" 
+                               {{ 'checked' if project and project.is_featured else '' }}>
+                        <span class="checkmark"></span>
+                        Featured Project (show on homepage)
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="order_index">Display Order</label>
+                    <input type="number" id="order_index" name="order_index" 
+                           value="{{ project.order_index if project else 0 }}" 
+                           min="0" placeholder="0">
+                    <small>Lower numbers appear first</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                {{ 'Update Project' if project else 'Add Project' }}
+            </button>
+            <a href="{{ url_for('admin_projects') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

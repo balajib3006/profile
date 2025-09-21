@@ -1,0 +1,109 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Edit Profile - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1><i class="fas fa-user"></i> Profile Settings</h1>
+    <p>Update your personal and professional information</p>
+</div>
+
+<div class="admin-content">
+    <form method="POST" class="admin-form">
+        <div class="form-section">
+            <h2>Personal Information</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" value="{{ profile.name if profile else '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title">Professional Title *</label>
+                    <input type="text" id="title" name="title" value="{{ profile.title if profile else '' }}" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Professional Description *</label>
+                <textarea id="description" name="description" rows="4" required>{{ profile.description if profile else '' }}</textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Contact Information</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" value="{{ profile.email if profile else '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="{{ profile.phone if profile else '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" value="{{ profile.location if profile else '' }}">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Social Links</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="github_url">GitHub URL</label>
+                    <input type="url" id="github_url" name="github_url" value="{{ profile.github_url if profile else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="linkedin_url">LinkedIn URL</label>
+                    <input type="url" id="linkedin_url" name="linkedin_url" value="{{ profile.linkedin_url if profile else '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="orcid_url">ORCID URL</label>
+                <input type="url" id="orcid_url" name="orcid_url" value="{{ profile.orcid_url if profile else '' }}">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Statistics</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="years_experience">Years of Experience</label>
+                    <input type="number" step="0.1" id="years_experience" name="years_experience" value="{{ profile.years_experience if profile else 0 }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="projects_completed">Projects Completed</label>
+                    <input type="number" id="projects_completed" name="projects_completed" value="{{ profile.projects_completed if profile else 0 }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="companies_worked">Companies Worked</label>
+                <input type="number" id="companies_worked" name="companies_worked" value="{{ profile.companies_worked if profile else 0 }}">
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Save Changes
+            </button>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
