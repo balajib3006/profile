@@ -9,7 +9,7 @@
 </div>
 
 <div class="admin-content">
-    <form method="POST" class="admin-form">
+    <form method="POST" class="admin-form" enctype="multipart/form-data">
         <div class="form-section">
             <h2>Personal Information</h2>
             
@@ -28,6 +28,27 @@
             <div class="form-group">
                 <label for="description">Professional Description *</label>
                 <textarea id="description" name="description" rows="4" required>{{ profile.description if profile else '' }}</textarea>
+            </div>
+            
+            <!-- Profile Image Upload -->
+            <div class="form-group">
+                <label for="profile_image">Profile Image</label>
+                {% if profile and profile.profile_image %}
+                <div class="current-image">
+                    <img src="{{ url_for('static', filename=profile.profile_image if profile.profile_image.startswith('uploads/') else 'images/' + profile.profile_image) }}" 
+                         alt="Current Profile Image" class="profile-preview">
+                    <p>Current profile image</p>
+                </div>
+                {% endif %}
+                <div class="file-upload-area">
+                    <input type="file" id="profile_image" name="profile_image" 
+                           accept="image/*" class="file-input">
+                    <div class="file-upload-content">
+                        <i class="fas fa-user-circle"></i>
+                        <p>Click to upload profile image</p>
+                        <small>Supports: PNG, JPG, JPEG, GIF, WEBP (Max: 16MB)</small>
+                    </div>
+                </div>
             </div>
         </div>
         

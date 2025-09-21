@@ -1,19 +1,36 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 import json
+import uuid
+from PIL import Image
+# import imghdr  # Deprecated in Python 3.13
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///portfolio.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Create upload folder if it doesn't exist
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+ALLOWED_MIME_TYPES = {'image/png', 'image/jpeg', 'image/gif', 'image/webp'}
+
+# Create upload folders if they don't exist
+upload_folders = [
+    'static/uploads',
+    'static/uploads/profile',
+    'static/uploads/projects',
+    'static/uploads/certifications',
+    'static/uploads/thumbnails'
+]
+
+for folder in upload_folders:
+    os.makedirs(folder, exist_ok=True)
 
 db = SQLAlchemy(app)
 
@@ -109,6 +126,126 @@ class Contact(db.Model):
     message = db.Column(db.Text, nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Image upload helper functions
+def allowed_file(filename):
+    """Check if file extension is allowed"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def validate_image(stream):
+    """Validate if uploaded file is a valid image using PIL"""
+    try:
+        # Try to open the image with PIL
+        stream.seek(0)
+        with Image.open(stream) as img:
+            # Verify it's a valid image
+            img.verify()
+            # Get the format
+            format = img.format.lower()
+            stream.seek(0)  # Reset stream position
+            return '.' + ('jpg' if format == 'jpeg' else format)
+    except Exception:
+        stream.seek(0)  # Reset stream position
+        return None
+
+def generate_unique_filename(original_filename):
+    """Generate unique filename with UUID"""
+    ext = original_filename.rsplit('.', 1)[1].lower() if '.' in original_filename else ''
+    return f"{uuid.uuid4().hex}.{ext}"
+
+def create_thumbnail(image_path, thumbnail_path, size=(300, 300)):
+    """Create thumbnail from uploaded image"""
+    try:
+        with Image.open(image_path) as img:
+            # Convert RGBA to RGB if necessary
+            if img.mode in ('RGBA', 'LA'):
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                img = background
+            
+            # Create thumbnail maintaining aspect ratio
+            img.thumbnail(size, Image.Resampling.LANCZOS)
+            
+            # Create a new image with the exact size and center the thumbnail
+            thumb = Image.new('RGB', size, (255, 255, 255))
+            thumb_w, thumb_h = img.size
+            offset = ((size[0] - thumb_w) // 2, (size[1] - thumb_h) // 2)
+            thumb.paste(img, offset)
+            
+            # Save thumbnail
+            thumb.save(thumbnail_path, 'JPEG', quality=85, optimize=True)
+            return True
+    except Exception as e:
+        print(f"Error creating thumbnail: {e}")
+        return False
+
+def save_uploaded_image(file, folder, create_thumb=True):
+    """Save uploaded image and create thumbnail"""
+    if not file or not allowed_file(file.filename):
+        return None, None
+    
+    # Validate image
+    file_ext = validate_image(file.stream)
+    if not file_ext:
+        return None, None
+    
+    # Generate unique filename
+    filename = generate_unique_filename(file.filename)
+    
+    # Create file paths
+    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], folder)
+    os.makedirs(upload_path, exist_ok=True)
+    
+    file_path = os.path.join(upload_path, filename)
+    
+    try:
+        # Save original image
+        file.save(file_path)
+        
+        # Create thumbnail if requested
+        thumbnail_path = None
+        if create_thumb:
+            thumb_filename = f"thumb_{filename}"
+            thumbnail_path = os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnails', thumb_filename)
+            os.makedirs(os.path.dirname(thumbnail_path), exist_ok=True)
+            
+            if create_thumbnail(file_path, thumbnail_path):
+                thumbnail_path = f"uploads/thumbnails/{thumb_filename}"
+            else:
+                thumbnail_path = None
+        
+        return f"uploads/{folder}/{filename}", thumbnail_path
+        
+    except Exception as e:
+        print(f"Error saving image: {e}")
+        # Clean up if there was an error
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        return None, None
+
+def delete_image_files(image_path):
+    """Delete image and its thumbnail"""
+    if not image_path:
+        return
+    
+    # Delete main image
+    full_path = os.path.join('static', image_path)
+    if os.path.exists(full_path):
+        try:
+            os.remove(full_path)
+        except Exception as e:
+            print(f"Error deleting image {full_path}: {e}")
+    
+    # Delete thumbnail
+    if image_path.startswith('uploads/'):
+        filename = os.path.basename(image_path)
+        thumb_path = os.path.join('static', 'uploads', 'thumbnails', f"thumb_{filename}")
+        if os.path.exists(thumb_path):
+            try:
+                os.remove(thumb_path)
+            except Exception as e:
+                print(f"Error deleting thumbnail {thumb_path}: {e}")
 
 # Helper functions
 def init_db():
@@ -348,6 +485,21 @@ def admin_profile():
             profile = Profile()
             db.session.add(profile)
         
+        # Handle profile image upload
+        if 'profile_image' in request.files:
+            file = request.files['profile_image']
+            if file and file.filename:
+                # Delete old profile image
+                if profile.profile_image and profile.profile_image.startswith('uploads/'):
+                    delete_image_files(profile.profile_image)
+                
+                # Save new profile image
+                image_path, thumbnail_path = save_uploaded_image(file, 'profile', create_thumb=True)
+                if image_path:
+                    profile.profile_image = image_path
+                else:
+                    flash('Failed to upload profile image. Please try again.', 'error')
+        
         profile.name = request.form['name']
         profile.title = request.form['title']
         profile.description = request.form['description']
@@ -509,74 +661,6 @@ def admin_projects():
     projects = Project.query.order_by(Project.order_index).all()
     return render_template('admin/projects.html', projects=projects)
 
-@app.route('/admin/project/add', methods=['GET', 'POST'])
-def admin_add_project():
-    if not session.get('is_admin'):
-        return redirect(url_for('admin_login'))
-    
-    if request.method == 'POST':
-        technologies = request.form.getlist('technologies[]')
-        technologies = [t for t in technologies if t.strip()]
-        
-        features = request.form.getlist('features[]')
-        features = [f for f in features if f.strip()]
-        
-        images = request.form.getlist('images[]')
-        images = [i for i in images if i.strip()]
-        
-        project = Project(
-            title=request.form['title'],
-            description=request.form['description'],
-            detailed_description=request.form.get('detailed_description', ''),
-            technologies=json.dumps(technologies),
-            features=json.dumps(features),
-            images=json.dumps(images),
-            project_url=request.form.get('project_url', ''),
-            github_url=request.form.get('github_url', ''),
-            is_featured=bool(request.form.get('is_featured')),
-            order_index=int(request.form.get('order_index', 0))
-        )
-        
-        db.session.add(project)
-        db.session.commit()
-        flash('Project added successfully!', 'success')
-        return redirect(url_for('admin_projects'))
-    
-    return render_template('admin/project_form.html', project=None)
-
-@app.route('/admin/project/edit/<int:id>', methods=['GET', 'POST'])
-def admin_edit_project(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('admin_login'))
-    
-    project = Project.query.get_or_404(id)
-    
-    if request.method == 'POST':
-        technologies = request.form.getlist('technologies[]')
-        technologies = [t for t in technologies if t.strip()]
-        
-        features = request.form.getlist('features[]')
-        features = [f for f in features if f.strip()]
-        
-        images = request.form.getlist('images[]')
-        images = [i for i in images if i.strip()]
-        
-        project.title = request.form['title']
-        project.description = request.form['description']
-        project.detailed_description = request.form.get('detailed_description', '')
-        project.technologies = json.dumps(technologies)
-        project.features = json.dumps(features)
-        project.images = json.dumps(images)
-        project.project_url = request.form.get('project_url', '')
-        project.github_url = request.form.get('github_url', '')
-        project.is_featured = bool(request.form.get('is_featured'))
-        project.order_index = int(request.form.get('order_index', 0))
-        
-        db.session.commit()
-        flash('Project updated successfully!', 'success')
-        return redirect(url_for('admin_projects'))
-    
-    return render_template('admin/project_form.html', project=project)
 
 @app.route('/admin/project/delete/<int:id>')
 def admin_delete_project(id):
@@ -597,52 +681,52 @@ def admin_certifications():
     certifications = Certification.query.order_by(Certification.order_index).all()
     return render_template('admin/certifications.html', certifications=certifications)
 
-@app.route('/admin/certification/add', methods=['GET', 'POST'])
-def admin_add_certification():
-    if not session.get('is_admin'):
-        return redirect(url_for('admin_login'))
+# @app.route('/admin/certification/add', methods=['GET', 'POST'])
+# def admin_add_certification():
+#     if not session.get('is_admin'):
+#         return redirect(url_for('admin_login'))
     
-    if request.method == 'POST':
-        certification = Certification(
-            name=request.form['name'],
-            issuer=request.form['issuer'],
-            issue_date=request.form.get('issue_date', ''),
-            expiry_date=request.form.get('expiry_date', ''),
-            credential_id=request.form.get('credential_id', ''),
-            credential_url=request.form.get('credential_url', ''),
-            image=request.form.get('image', ''),
-            order_index=int(request.form.get('order_index', 0))
-        )
+#     if request.method == 'POST':
+#         certification = Certification(
+#             name=request.form['name'],
+#             issuer=request.form['issuer'],
+#             issue_date=request.form.get('issue_date', ''),
+#             expiry_date=request.form.get('expiry_date', ''),
+#             credential_id=request.form.get('credential_id', ''),
+#             credential_url=request.form.get('credential_url', ''),
+#             image=request.form.get('image', ''),
+#             order_index=int(request.form.get('order_index', 0))
+#         )
         
-        db.session.add(certification)
-        db.session.commit()
-        flash('Certification added successfully!', 'success')
-        return redirect(url_for('admin_certifications'))
+#         db.session.add(certification)
+#         db.session.commit()
+#         flash('Certification added successfully!', 'success')
+#         return redirect(url_for('admin_certifications'))
     
-    return render_template('admin/certification_form.html', certification=None)
+#     return render_template('admin/certification_form.html', certification=None)
 
-@app.route('/admin/certification/edit/<int:id>', methods=['GET', 'POST'])
-def admin_edit_certification(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('admin_login'))
+# @app.route('/admin/certification/edit/<int:id>', methods=['GET', 'POST'])
+# def admin_edit_certification(id):
+#     if not session.get('is_admin'):
+#         return redirect(url_for('admin_login'))
     
-    certification = Certification.query.get_or_404(id)
+#     certification = Certification.query.get_or_404(id)
     
-    if request.method == 'POST':
-        certification.name = request.form['name']
-        certification.issuer = request.form['issuer']
-        certification.issue_date = request.form.get('issue_date', '')
-        certification.expiry_date = request.form.get('expiry_date', '')
-        certification.credential_id = request.form.get('credential_id', '')
-        certification.credential_url = request.form.get('credential_url', '')
-        certification.image = request.form.get('image', '')
-        certification.order_index = int(request.form.get('order_index', 0))
+#     if request.method == 'POST':
+#         certification.name = request.form['name']
+#         certification.issuer = request.form['issuer']
+#         certification.issue_date = request.form.get('issue_date', '')
+#         certification.expiry_date = request.form.get('expiry_date', '')
+#         certification.credential_id = request.form.get('credential_id', '')
+#         certification.credential_url = request.form.get('credential_url', '')
+#         certification.image = request.form.get('image', '')
+#         certification.order_index = int(request.form.get('order_index', 0))
         
-        db.session.commit()
-        flash('Certification updated successfully!', 'success')
-        return redirect(url_for('admin_certifications'))
+#         db.session.commit()
+#         flash('Certification updated successfully!', 'success')
+#         return redirect(url_for('admin_certifications'))
     
-    return render_template('admin/certification_form.html', certification=certification)
+#     return render_template('admin/certification_form.html', certification=certification)
 
 @app.route('/admin/certification/delete/<int:id>')
 def admin_delete_certification(id):
@@ -700,6 +784,245 @@ def contact():
         return jsonify({'success': True, 'message': 'Message sent successfully!'})
     except Exception as e:
         return jsonify({'success': False, 'message': 'Failed to send message. Please try again.'})
+
+# Image upload routes
+@app.route('/admin/upload-image', methods=['POST'])
+def admin_upload_image():
+    """AJAX endpoint for image uploads"""
+    if not session.get('is_admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    if 'image' not in request.files:
+        return jsonify({'success': False, 'message': 'No image file provided'}), 400
+    
+    file = request.files['image']
+    folder = request.form.get('folder', 'projects')  # Default to projects folder
+    
+    if not file or not file.filename:
+        return jsonify({'success': False, 'message': 'No image selected'}), 400
+    
+    # Save the uploaded image
+    image_path, thumbnail_path = save_uploaded_image(file, folder, create_thumb=True)
+    
+    if image_path:
+        return jsonify({
+            'success': True,
+            'image_path': image_path,
+            'thumbnail_path': thumbnail_path,
+            'message': 'Image uploaded successfully'
+        })
+    else:
+        return jsonify({'success': False, 'message': 'Failed to upload image'}), 500
+
+@app.route('/admin/delete-image', methods=['POST'])
+def admin_delete_image():
+    """AJAX endpoint for image deletion"""
+    if not session.get('is_admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    image_path = request.json.get('image_path')
+    if not image_path:
+        return jsonify({'success': False, 'message': 'No image path provided'}), 400
+    
+    try:
+        delete_image_files(image_path)
+        return jsonify({'success': True, 'message': 'Image deleted successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Failed to delete image'}), 500
+
+# Update project routes to handle image uploads
+@app.route('/admin/project/add', methods=['GET', 'POST'])
+def admin_add_project():
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        technologies = request.form.getlist('technologies[]')
+        technologies = [t for t in technologies if t.strip()]
+        
+        features = request.form.getlist('features[]')
+        features = [f for f in features if f.strip()]
+        
+        # Handle image uploads
+        uploaded_images = []
+        
+        # Handle multiple image uploads
+        if 'project_images' in request.files:
+            files = request.files.getlist('project_images')
+            for file in files:
+                if file and file.filename:
+                    image_path, thumbnail_path = save_uploaded_image(file, 'projects', create_thumb=True)
+                    if image_path:
+                        uploaded_images.append(image_path)
+        
+        # Also handle images from URL inputs (for backward compatibility)
+        url_images = request.form.getlist('images[]')
+        url_images = [i for i in url_images if i.strip()]
+        
+        # Combine uploaded images and URL images
+        all_images = uploaded_images + url_images
+        
+        project = Project(
+            title=request.form['title'],
+            description=request.form['description'],
+            detailed_description=request.form.get('detailed_description', ''),
+            technologies=json.dumps(technologies),
+            features=json.dumps(features),
+            images=json.dumps(all_images),
+            project_url=request.form.get('project_url', ''),
+            github_url=request.form.get('github_url', ''),
+            is_featured=bool(request.form.get('is_featured')),
+            order_index=int(request.form.get('order_index', 0))
+        )
+        
+        db.session.add(project)
+        db.session.commit()
+        flash('Project added successfully!', 'success')
+        return redirect(url_for('admin_projects'))
+    
+    return render_template('admin/project_form.html', project=None)
+
+@app.route('/admin/project/edit/<int:id>', methods=['GET', 'POST'])
+def admin_edit_project(id):
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+    
+    project = Project.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        technologies = request.form.getlist('technologies[]')
+        technologies = [t for t in technologies if t.strip()]
+        
+        features = request.form.getlist('features[]')
+        features = [f for f in features if f.strip()]
+        
+        # Get existing images
+        existing_images = json.loads(project.images) if project.images else []
+        
+        # Handle new image uploads
+        uploaded_images = []
+        if 'project_images' in request.files:
+            files = request.files.getlist('project_images')
+            for file in files:
+                if file and file.filename:
+                    image_path, thumbnail_path = save_uploaded_image(file, 'projects', create_thumb=True)
+                    if image_path:
+                        uploaded_images.append(image_path)
+        
+        # Handle images to keep (from existing images)
+        keep_images = request.form.getlist('keep_images[]')
+        
+        # Handle new URL images
+        url_images = request.form.getlist('images[]')
+        url_images = [i for i in url_images if i.strip()]
+        
+        # Delete images that are not being kept
+        for img in existing_images:
+            if img not in keep_images and img.startswith('uploads/'):
+                delete_image_files(img)
+        
+        # Combine kept images, new uploaded images, and URL images
+        all_images = keep_images + uploaded_images + url_images
+        
+        project.title = request.form['title']
+        project.description = request.form['description']
+        project.detailed_description = request.form.get('detailed_description', '')
+        project.technologies = json.dumps(technologies)
+        project.features = json.dumps(features)
+        project.images = json.dumps(all_images)
+        project.project_url = request.form.get('project_url', '')
+        project.github_url = request.form.get('github_url', '')
+        project.is_featured = bool(request.form.get('is_featured'))
+        project.order_index = int(request.form.get('order_index', 0))
+        
+        db.session.commit()
+        flash('Project updated successfully!', 'success')
+        return redirect(url_for('admin_projects'))
+    
+    return render_template('admin/project_form.html', project=project)
+
+# Update certification routes to handle image uploads
+@app.route('/admin/certification/add', methods=['GET', 'POST'])
+def admin_add_certification():
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        # Handle image upload
+        image_path = None
+        if 'certification_image' in request.files:
+            file = request.files['certification_image']
+            if file and file.filename:
+                image_path, thumbnail_path = save_uploaded_image(file, 'certifications', create_thumb=True)
+        
+        # Use uploaded image or URL image
+        final_image = image_path if image_path else request.form.get('image', '')
+        
+        certification = Certification(
+            name=request.form['name'],
+            issuer=request.form['issuer'],
+            issue_date=request.form.get('issue_date', ''),
+            expiry_date=request.form.get('expiry_date', ''),
+            credential_id=request.form.get('credential_id', ''),
+            credential_url=request.form.get('credential_url', ''),
+            image=final_image,
+            order_index=int(request.form.get('order_index', 0))
+        )
+        
+        db.session.add(certification)
+        db.session.commit()
+        flash('Certification added successfully!', 'success')
+        return redirect(url_for('admin_certifications'))
+    
+    return render_template('admin/certification_form.html', certification=None)
+
+@app.route('/admin/certification/edit/<int:id>', methods=['GET', 'POST'])
+def admin_edit_certification(id):
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+    
+    certification = Certification.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        # Handle image upload
+        if 'certification_image' in request.files:
+            file = request.files['certification_image']
+            if file and file.filename:
+                # Delete old image
+                if certification.image and certification.image.startswith('uploads/'):
+                    delete_image_files(certification.image)
+                
+                # Save new image
+                image_path, thumbnail_path = save_uploaded_image(file, 'certifications', create_thumb=True)
+                if image_path:
+                    certification.image = image_path
+                else:
+                    flash('Failed to upload certification image. Please try again.', 'error')
+        
+        # Update other fields
+        certification.name = request.form['name']
+        certification.issuer = request.form['issuer']
+        certification.issue_date = request.form.get('issue_date', '')
+        certification.expiry_date = request.form.get('expiry_date', '')
+        certification.credential_id = request.form.get('credential_id', '')
+        certification.credential_url = request.form.get('credential_url', '')
+        
+        # Update image URL if no file was uploaded
+        if 'certification_image' not in request.files or not request.files['certification_image'].filename:
+            url_image = request.form.get('image', '')
+            if url_image and url_image != certification.image:
+                # Delete old uploaded image if switching to URL
+                if certification.image and certification.image.startswith('uploads/'):
+                    delete_image_files(certification.image)
+                certification.image = url_image
+        
+        certification.order_index = int(request.form.get('order_index', 0))
+        
+        db.session.commit()
+        flash('Certification updated successfully!', 'success')
+        return redirect(url_for('admin_certifications'))
+    
+    return render_template('admin/certification_form.html', certification=certification)
 
 @app.route('/api/project/<int:id>')
 def api_project(id):

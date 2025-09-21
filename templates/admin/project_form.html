@@ -12,7 +12,7 @@
 </div>
 
 <div class="admin-content">
-    <form method="POST" class="admin-form">
+    <form method="POST" class="admin-form" enctype="multipart/form-data">
         <div class="form-section">
             <h2>Basic Information</h2>
             
@@ -98,31 +98,64 @@
         <div class="form-section">
             <h2>Images</h2>
             
-            <div class="dynamic-list" id="images-list">
-                {% if project and project.images %}
-                    {% for image in project.images|from_json %}
-                    <div class="list-item">
-                        <input type="url" name="images[]" value="{{ image }}" 
-                               placeholder="Enter image URL">
-                        <button type="button" class="btn btn-sm btn-danger remove-item">
-                            <i class="fas fa-times"></i>
-                        </button>
+            <!-- Image Upload Section -->
+            <div class="form-group">
+                <label for="project_images">Upload Images</label>
+                <div class="file-upload-area">
+                    <input type="file" id="project_images" name="project_images" 
+                           multiple accept="image/*" class="file-input">
+                    <div class="file-upload-content">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload images or drag and drop</p>
+                        <small>Supports: PNG, JPG, JPEG, GIF, WEBP (Max: 16MB each)</small>
                     </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="list-item">
-                        <input type="url" name="images[]" placeholder="Enter image URL">
-                        <button type="button" class="btn btn-sm btn-danger remove-item">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                {% endif %}
+                </div>
+                <div id="upload-preview" class="upload-preview"></div>
             </div>
             
-            <button type="button" class="btn btn-secondary add-item" data-target="images-list">
-                <i class="fas fa-plus"></i>
-                Add Image
-            </button>
+            <!-- Existing Images (for editing) -->
+            {% if project and project.images %}
+            <div class="form-group">
+                <label>Current Images</label>
+                <div class="existing-images" id="existing-images">
+                    {% for image in project.images|from_json %}
+                    <div class="image-item" data-image="{{ image }}">
+                        <div class="image-preview">
+                            {% if image.startswith('uploads/') %}
+                                <img src="{{ url_for('static', filename=image) }}" alt="Project Image">
+                            {% else %}
+                                <img src="{{ image }}" alt="Project Image">
+                            {% endif %}
+                        </div>
+                        <div class="image-actions">
+                            <input type="checkbox" name="keep_images[]" value="{{ image }}" checked>
+                            <label>Keep</label>
+                            <button type="button" class="btn btn-sm btn-danger remove-existing-image">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- URL Images (backward compatibility) -->
+            <div class="form-group">
+                <label>Or Add Image URLs</label>
+                <div class="dynamic-list" id="images-list">
+                    <div class="list-item">
+                        <input type="url" name="images[]" placeholder="Enter image URL (optional)">
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary add-item" data-target="images-list">
+                    <i class="fas fa-plus"></i>
+                    Add Image URL
+                </button>
+            </div>
         </div>
         
         <div class="form-section">
