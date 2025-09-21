@@ -719,4 +719,4 @@ def api_project(id):
 if __name__ == '__main__':
     with app.app_context():
         init_db()
-    app.run(host="192.168.29.232", port=5000, debug=True)
+    app.run(debug=True)
