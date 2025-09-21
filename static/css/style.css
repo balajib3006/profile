@@ -259,42 +259,9 @@ a:hover {
   z-index: 1;
 }
 
-/* Mobile Menu Toggle */
+/* Mobile Menu Toggle - Hidden */
 .mobile-menu-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 30px;
-  height: 30px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 1001;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-}
-
-.mobile-menu-toggle span {
-  width: 100%;
-  height: 3px;
-  background: var(--text-primary);
-  border-radius: 2px;
-  transition: all var(--transition-normal);
-  transform-origin: center;
-}
-
-.mobile-menu-toggle.active span:nth-child(1) {
-  transform: rotate(45deg) translate(7px, 7px);
-}
-
-.mobile-menu-toggle.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.mobile-menu-toggle.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -7px);
+  display: none !important;
 }
 
 /* Navigation - Mobile First */
@@ -2099,32 +2066,40 @@ a:hover {
   .nav-container { max-width: 1400px; }
 }
 
-/* Mobile Floating Action Buttons */
+/* Mobile Floating Action Buttons - Redesigned */
 .mobile-fab-container {
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
   z-index: 1001;
   display: none;
   flex-direction: row;
   gap: var(--spacing-xs);
   background: var(--bg-secondary);
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-xl);
-  border: 2px solid var(--border-color);
-  box-shadow: var(--shadow-xl);
-  backdrop-filter: blur(20px);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(15px);
   max-width: calc(100vw - 40px);
   overflow-x: auto;
+  transition: all var(--transition-normal);
+  transform: translateY(0);
+}
+
+.mobile-fab-container.hidden {
+  transform: translateY(-100px);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .mobile-fab-container .fab-button {
-  width: 45px;
-  height: 45px;
-  font-size: 1.1rem;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 0.9rem;
+  border-radius: var(--radius-md);
   flex-shrink: 0;
-  min-width: 45px;
+  min-width: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2143,6 +2118,66 @@ a:hover {
   color: white;
   transform: translateY(-2px) scale(1.05);
   box-shadow: var(--shadow-lg);
+}
+
+/* Special styling for menu button */
+.mobile-fab-container .fab-button.menu-toggle {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  position: relative;
+}
+
+.mobile-fab-container .fab-button.menu-toggle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: var(--radius-md);
+  z-index: -1;
+}
+
+.mobile-fab-container .fab-button.menu-toggle:hover {
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.mobile-fab-container .fab-button.menu-toggle.active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* Menu toggle icon animation */
+.mobile-fab-container .menu-toggle-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 18px;
+  height: 14px;
+}
+
+.mobile-fab-container .menu-toggle-icon span {
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all var(--transition-normal);
+  transform-origin: center;
+}
+
+.mobile-fab-container .fab-button.menu-toggle.active .menu-toggle-icon span:nth-child(1) {
+  transform: rotate(45deg) translate(4px, 4px);
+}
+
+.mobile-fab-container .fab-button.menu-toggle.active .menu-toggle-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-fab-container .fab-button.menu-toggle.active .menu-toggle-icon span:nth-child(3) {
+  transform: rotate(-45deg) translate(4px, -4px);
 }
 
 /* Mobile Menu Styles */
@@ -2303,7 +2338,14 @@ a:hover {
     border-radius: var(--radius-md);
     border: 2px solid var(--border-color);
     box-shadow: var(--shadow-lg);
-    transition: all var(--transition-fast);
+    transition: all var(--transition-normal);
+    transform: translateY(0);
+  }
+  
+  .nav-logo.hidden {
+    transform: translateY(-100px);
+    opacity: 0;
+    pointer-events: none;
   }
   
   .nav-logo:hover {

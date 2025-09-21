@@ -175,15 +175,26 @@ class MobileNavigationManager {
     this.navOverlay = null;
     this.mobileFabContainer = null;
     this.isOpen = false;
+    this.lastScrollY = 0;
     this.init();
   }
 
   init() {
-    this.createMobileToggle();
+    this.cleanupExistingElements();
     this.createOverlay();
     this.createMobileFAB();
     this.bindEvents();
+    this.setupScrollBehavior();
     console.log('Mobile Navigation Manager initialized');
+  }
+
+  cleanupExistingElements() {
+    // Remove any existing mobile toggle buttons
+    const existingToggles = document.querySelectorAll('.mobile-menu-toggle, #mobile-menu-toggle');
+    existingToggles.forEach(toggle => {
+      toggle.remove();
+      console.log('Removed existing mobile toggle button');
+    });
   }
 
   createMobileFAB() {
@@ -251,28 +262,7 @@ class MobileNavigationManager {
     console.log('Mobile FAB container created with buttons:', this.mobileFabContainer.children.length);
   }
 
-  createMobileToggle() {
-    // Remove existing toggle if any
-    const existingToggle = document.getElementById('mobile-menu-toggle');
-    if (existingToggle) {
-      existingToggle.remove();
-    }
-
-    // Create new toggle
-    this.mobileToggle = document.createElement('button');
-    this.mobileToggle.id = 'mobile-menu-toggle';
-    this.mobileToggle.className = 'mobile-menu-toggle';
-    this.mobileToggle.setAttribute('aria-label', 'Toggle mobile menu');
-    this.mobileToggle.innerHTML = '<span></span><span></span><span></span>';
-    
-    // Ensure it's visible on mobile
-    if (Utils.isMobile()) {
-      this.mobileToggle.style.display = 'flex';
-    }
-    
-    document.body.appendChild(this.mobileToggle);
-    console.log('Mobile toggle created');
-  }
+  // Mobile toggle removed - no longer needed
 
   createOverlay() {
     // Remove existing overlay if any
@@ -287,64 +277,50 @@ class MobileNavigationManager {
     console.log('Mobile overlay created');
   }
 
-  bindEvents() {
-    // Mobile toggle click
-    if (this.mobileToggle) {
-      this.mobileToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.toggleMenu();
-        console.log('Mobile toggle clicked');
-      });
-    }
-
-    // Overlay click
-    if (this.navOverlay) {
-      this.navOverlay.addEventListener('click', () => {
-        this.closeMenu();
-        console.log('Overlay clicked');
-      });
-    }
-    
-    // Close menu when clicking nav links
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        if (Utils.isMobile() && this.isOpen) {
-          setTimeout(() => this.closeMenu(), 300); // Small delay for smooth transition
+  setupScrollBehavior() {
+    window.addEventListener('scroll', Utils.throttle(() => {
+      if (!Utils.isMobile()) return;
+      
+      const scrollY = window.scrollY;
+      const scrollDirection = scrollY > this.lastScrollY ? 'down' : 'up';
+      
+      // Hide FAB and nav logo when scrolling down, show when scrolling up
+      if (scrollDirection === 'down' && scrollY > 100) {
+        if (this.mobileFabContainer) {
+          this.mobileFabContainer.classList.add('hidden');
         }
-      });
-    });
-
-    // Handle resize
-    window.addEventListener('resize', Utils.debounce(() => {
-      if (!Utils.isMobile() && this.isOpen) {
-        this.closeMenu();
+        // Hide nav logo
+        const navLogo = document.querySelector('.nav-logo');
+        if (navLogo) {
+          navLogo.classList.add('hidden');
+        }
+      } else if (scrollDirection === 'up' || scrollY <= 100) {
+        if (this.mobileFabContainer) {
+          this.mobileFabContainer.classList.remove('hidden');
+        }
+        // Show nav logo
+        const navLogo = document.querySelector('.nav-logo');
+        if (navLogo) {
+          navLogo.classList.remove('hidden');
+        }
       }
       
-      // Show/hide toggle based on screen size
-      if (this.mobileToggle) {
+      this.lastScrollY = scrollY;
+    }, 16));
+  }
+
+  bindEvents() {
+    // Handle resize
+    window.addEventListener('resize', Utils.debounce(() => {
+      // Show/hide FAB based on screen size
+      if (this.mobileFabContainer) {
         if (Utils.isMobile()) {
-          this.mobileToggle.style.display = 'flex';
+          this.mobileFabContainer.style.display = 'flex';
         } else {
-          this.mobileToggle.style.display = 'none';
+          this.mobileFabContainer.style.display = 'none';
         }
       }
     }, 100));
-
-    // Handle escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.isOpen) {
-        this.closeMenu();
-      }
-    });
-
-    // Prevent body scroll when menu is open
-    document.addEventListener('touchmove', (e) => {
-      if (this.isOpen && !e.target.closest('.nav-menu')) {
-        e.preventDefault();
-      }
-    }, { passive: false });
   }
 
   toggleMenu() {
