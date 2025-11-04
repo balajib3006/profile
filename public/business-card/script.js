@@ -7,7 +7,6 @@ TEL;TYPE=WORK,VOICE:+91 9159875082
 EMAIL;TYPE=HOME,INTERNET:balaji3006@outlook.in
 EMAIL;TYPE=WORK,INTERNET:balajib@rangsonsaerospace.com
 ADR;TYPE=WORK:;;Bengaluru;Karnataka;5600278;India
-URL:https://balajib3006.github.io/profile/public/index.html
 URL;TYPE=LinkedIn:https://www.linkedin.com/in/balajib300602
 URL;TYPE=GitHub:https://github.com/balajib3006
 URL;TYPE=WhatsApp:https://wa.me/+919159875082

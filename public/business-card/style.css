@@ -23,7 +23,8 @@ body {
 /* Card */
 .card {
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  padding: calc(var(--spacing-lg, 1.5rem));
+  /* reduced padding to make the card more compact */
+  padding: calc(var(--spacing-md, 1rem));
   border-radius: var(--radius-lg, 20px);
   box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.6));
   max-width: 420px;
@@ -35,11 +36,11 @@ body {
 }
 
 .card img.logo {
-  width: 100px;
-  height: 100px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: calc(var(--spacing-sm, 0.5rem));
+  margin-bottom: calc(var(--spacing-sm, 0.4rem));
   border: 3px solid var(--primary-color, #00bcd4);
 }
 
@@ -85,7 +86,8 @@ h2 {
 /* Info */
 .info {
   text-align: left;
-  margin: calc(var(--spacing-md, 1rem)) 0;
+  /* reduced vertical spacing for compact layout */
+  margin: calc(var(--spacing-sm, 0.6rem)) 0;
 }
 
 .info p {
@@ -110,7 +112,8 @@ h2 {
   display: flex;
   justify-content: center;
   gap: var(--spacing-sm, 0.5rem);
-  margin-top: var(--spacing-lg, 1.5rem);
+  /* bring actions closer to the content */
+  margin-top: var(--spacing-md, 0.9rem);
   flex-wrap: wrap;
 }
 
@@ -135,14 +138,15 @@ h2 {
 
 /* QR */
 .qr {
-  margin-top: var(--spacing-2xl, 2rem);
+  /* smaller top gap to reduce overall card height */
+  margin-top: var(--spacing-lg, 1rem);
 }
 
 .qr img {
-  width: 150px;
+  width: 100px;
   border: 3px solid var(--primary-color, #00bcd4);
-  border-radius: 12px;
-  padding: 8px;
+  border-radius: 10px;
+  padding: 6px;
   background: var(--bg-primary, #fff);
   transition: transform var(--transition-fast, 0.15s), box-shadow var(--transition-normal, 0.3s);
 }
@@ -161,7 +165,7 @@ h2 {
 /* Mobile */
 @media (max-width: 480px) {
   .card {
-    padding: 0.9rem;
+    padding: 0.7rem;
     border-radius: 15px;
   }
   h1 { font-size: 1.3rem; }
@@ -169,7 +173,7 @@ h2 {
   .btn { flex: 1 1 100%; text-align: center; }
   .btn-row { flex-direction: column; gap: 8px; }
   .action-btn { font-size: 0.85rem; padding: 8px; }
-  .qr img { width: 120px; }
+  .qr img { width: 86px; }
 }
 
 /* FAB - Save Contact */
@@ -235,8 +239,8 @@ h2 {
 
 /* Profile photo helper class used from main site */
 .profile-photo {
-  width: 120px;
-  height: 120px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   object-fit: cover;
   display: block;
