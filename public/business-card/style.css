@@ -27,7 +27,7 @@ body {
   padding: calc(var(--spacing-md, 1rem));
   border-radius: var(--radius-lg, 20px);
   box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.6));
-  max-width: 420px;
+  max-width: 540px;
   width: 100%;
   text-align: center;
   color: var(--text-primary, #e6edf3);
@@ -139,14 +139,14 @@ h2 {
 /* QR */
 .qr {
   /* smaller top gap to reduce overall card height */
-  margin-top: var(--spacing-lg, 1rem);
+  margin-top: var(--spacing-lg, 2rem);
 }
 
 .qr img {
-  width: 100px;
+  width: 170px;
   border: 3px solid var(--primary-color, #00bcd4);
-  border-radius: 10px;
-  padding: 6px;
+  border-radius: 12px;
+  padding: 8px;
   background: var(--bg-primary, #fff);
   transition: transform var(--transition-fast, 0.15s), box-shadow var(--transition-normal, 0.3s);
 }
@@ -239,13 +239,13 @@ h2 {
 
 /* Profile photo helper class used from main site */
 .profile-photo {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
+  width: 86%;
+  height: 86%;
   object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--primary-color);
   display: block;
   margin: 0 auto var(--spacing-md, 1rem);
-  border: 3px solid var(--primary-color, #00bcd4);
 }
 
 /* Make sure card children aren't using global h1/h2 styles too large */
