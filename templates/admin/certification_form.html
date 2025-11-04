@@ -1,0 +1,102 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Edit' if certification else 'Add' }} Certification - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>
+        <i class="fas fa-certificate"></i>
+        {{ 'Edit Certification' if certification else 'Add New Certification' }}
+    </h1>
+    <p>{{ 'Update the certification details' if certification else 'Add a new professional certification' }}</p>
+</div>
+
+<div class="admin-content">
+    <form method="POST" class="admin-form">
+        <div class="form-section">
+            <h2>Certification Information</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Certification Name *</label>
+                    <input type="text" id="name" name="name" 
+                           value="{{ certification.name if certification else '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="issuer">Issuing Organization *</label>
+                    <input type="text" id="issuer" name="issuer" 
+                           value="{{ certification.issuer if certification else '' }}" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="issue_date">Issue Date</label>
+                    <input type="text" id="issue_date" name="issue_date" 
+                           value="{{ certification.issue_date if certification else '' }}" 
+                           placeholder="e.g., January 2023 or 2023">
+                </div>
+                
+                <div class="form-group">
+                    <label for="expiry_date">Expiry Date</label>
+                    <input type="text" id="expiry_date" name="expiry_date" 
+                           value="{{ certification.expiry_date if certification else '' }}" 
+                           placeholder="e.g., January 2026 or Never expires">
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Credential Details</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="credential_id">Credential ID</label>
+                    <input type="text" id="credential_id" name="credential_id" 
+                           value="{{ certification.credential_id if certification else '' }}" 
+                           placeholder="Certificate or credential ID">
+                </div>
+                
+                <div class="form-group">
+                    <label for="credential_url">Credential URL</label>
+                    <input type="url" id="credential_url" name="credential_url" 
+                           value="{{ certification.credential_url if certification else '' }}" 
+                           placeholder="https://example.com/verify">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="image">Certificate Image URL</label>
+                <input type="url" id="image" name="image" 
+                       value="{{ certification.image if certification else '' }}" 
+                       placeholder="https://example.com/certificate.jpg">
+                <small>URL to the certificate image or badge</small>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Display Settings</h2>
+            
+            <div class="form-group">
+                <label for="order_index">Display Order</label>
+                <input type="number" id="order_index" name="order_index" 
+                       value="{{ certification.order_index if certification else 0 }}" 
+                       min="0" placeholder="0">
+                <small>Lower numbers appear first</small>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                {{ 'Update Certification' if certification else 'Add Certification' }}
+            </button>
+            <a href="{{ url_for('admin_certifications') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

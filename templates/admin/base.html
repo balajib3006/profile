@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.is_admin %}
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-cog"></i> Admin Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            <a href="{{ url_for('admin_profile') }}" class="nav-item {% if request.endpoint == 'admin_profile' %}active{% endif %}">
+                <i class="fas fa-user"></i>
+                Profile
+            </a>
+            <a href="{{ url_for('admin_experiences') }}" class="nav-item {% if 'experience' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-briefcase"></i>
+                Experience
+            </a>
+            <a href="{{ url_for('admin_skills') }}" class="nav-item {% if 'skill' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-tools"></i>
+                Skills
+            </a>
+            <a href="{{ url_for('admin_projects') }}" class="nav-item {% if 'project' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-folder"></i>
+                Projects
+            </a>
+            <a href="{{ url_for('admin_certifications') }}" class="nav-item {% if 'certification' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-certificate"></i>
+                Certifications
+            </a>
+            <a href="{{ url_for('admin_messages') }}" class="nav-item {% if 'message' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-envelope"></i>
+                Messages
+            </a>
+            <div class="nav-divider"></div>
+            <a href="{{ url_for('index') }}" class="nav-item" target="_blank">
+                <i class="fas fa-external-link-alt"></i>
+                View Site
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </nav>
+    </aside>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="admin-main {% if not session.is_admin %}no-sidebar{% endif %}">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <span>{{ message }}</span>
+                            <button class="flash-close">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
