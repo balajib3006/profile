@@ -11,15 +11,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
-  <div class="card">
-    <!-- Logo / Avatar -->
-    <div class="hero-image">
-      <div class="image-container">
-      <img src="profile-photo.jpg" alt="Balaji B - Associate Engineer" class="profile-photo">
-      <div class="image-decoration"></div>
-    </div>
+  <div class="photo-wrapper">
+    <img src="profile-photo.jpg" alt="Balaji B - Associate Engineer" class="profile-photo">
   </div>
-
+  <div class="card">
     <!-- Name + Title -->
     <h1>Balaji B</h1>
     <h2>Associate Engineer<br>Rangsons Aerospace Pvt Ltd</h2>
@@ -38,9 +33,9 @@
         <i class="fas fa-envelope"></i>
         <span>Email</span>
       </a>
-      <a href="#" class="btn" onclick="handleContact(event)">
-        <i class="fas fa-address-card"></i>
-        <span>Save Contact</span>
+      <a href="https://www.linkedin.com/in/balajib300602" target="_blank" class="btn">
+        <i class="fab fa-linkedin-in"></i>
+        <span>LinkedIn</span>
       </a>
     </div>
 
@@ -52,17 +47,9 @@
       <p><i class="fas fa-map-marker-alt"></i> Bengaluru, Karnataka, 5600278, India</p>
     </div>
 
-    <!-- Social Links and Share -->
-    <div class="btn-row social-buttons">
-      <a href="https://www.linkedin.com/in/balajib300602" target="_blank" class="btn">
-        <i class="fab fa-linkedin-in"></i>
-        <span>LinkedIn</span>
-      </a>
-      <a href="https://github.com/balajib3006" target="_blank" class="btn">
-        <i class="fab fa-github"></i>
-        <span>GitHub</span>
-      </a>
-      <button class="btn" onclick="shareCard()">
+    <!-- Share Button -->
+    <div class="share-wrapper">
+      <button class="btn share-btn" onclick="shareCard()">
         <i class="fas fa-share-alt"></i>
         <span>Share</span>
       </button>
