@@ -57,6 +57,20 @@ h2 {
   margin: 0.2rem 0 0.6rem;
 }
 
+/* Share Button */
+.share-action {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 1rem 0;
+  padding: 0 0.5rem;
+}
+
+.share-btn {
+  min-width: 160px;
+  padding: 0.75rem 2rem;
+}
+
 /* Buttons */
 .btn-row {
   display: flex;
@@ -64,6 +78,8 @@ h2 {
   gap: calc(var(--spacing-sm, 0.5rem));
   justify-content: center;
   margin: calc(var(--spacing-sm, 0.5rem)) 0;
+  width: 100%;
+  padding: 0 0.5rem;
 }
 
 .btn {
@@ -73,8 +89,13 @@ h2 {
   color: var(--text-primary, #fff);
   text-decoration: none;
   font-size: 0.95rem;
-  transition: all var(--transition-normal, 0.3s) ;
+  transition: all var(--transition-normal, 0.3s);
   background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
 }
 
 .btn:hover {
@@ -210,13 +231,20 @@ h2 {
   }
 
   .btn {
-    min-height: 48px; /* minimum touch target */
+    width: 100%;
+    min-height: 48px; /* larger touch target for mobile */
     font-size: 0.95rem;
     padding: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+  }
+
+  .share-action {
+    padding: 0 0.5rem;
+  }
+
+  .share-btn {
+    width: 100%;
+    max-width: 280px;
+    min-height: 48px;
   }
 
   .info {
@@ -297,6 +325,36 @@ h2 {
     padding: 0.75rem;
     font-size: 1rem;
   }
+}
+
+/* Social Buttons */
+.social-buttons {
+  margin: 1rem 0;
+}
+
+.social-buttons .btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  min-width: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.social-buttons .btn i {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-buttons .btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg, var(--primary-color, #00bcd4), var(--accent-color, #f59e0b));
+  border-color: transparent;
 }
 
 /* Profile photo helper class used from main site */
