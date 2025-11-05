@@ -7,6 +7,8 @@
   <!-- Load main theme first so variables are available, then local overrides -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="style.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
   <div class="card">
@@ -22,27 +24,52 @@
     <h1>Balaji B</h1>
     <h2>Associate Engineer<br>Rangsons Aerospace Pvt Ltd</h2>
 
-    <!-- Quick Buttons -->
+    <!-- Quick Actions -->
     <div class="btn-row">
-      <a href="tel:+919159875082" class="btn">📞 Call</a>
-      <a href="https://wa.me/919159875082" class="btn">💬 WhatsApp</a>
-      <a href="mailto:balajib@rangsonsaerospace.com" class="btn">✉️ Mail</a>
+      <a href="tel:+919159875082" class="btn">
+        <i class="fas fa-phone"></i>
+        <span>Call</span>
+      </a>
+      <a href="https://wa.me/919159875082" class="btn">
+        <i class="fab fa-whatsapp"></i>
+        <span>WhatsApp</span>
+      </a>
+      <a href="mailto:balajib@rangsonsaerospace.com" class="btn">
+        <i class="fas fa-envelope"></i>
+        <span>Email</span>
+      </a>
+      <a href="#" class="btn" onclick="handleContact(event)">
+        <i class="fas fa-address-card"></i>
+        <span>Save Contact</span>
+      </a>
     </div>
 
     <!-- Contact Info -->
     <div class="info">
-      <p>📞 +91 9159875082</p>
-      <p>📧 balaji3006@outlook.in</p>
-      <p>📧 balajib@rangsonsaerospace.com</p>
-      <p>📍 Bengaluru, Karnataka, 5600278, India</p>
-      <p>🔗 <a href="https://www.linkedin.com/in/balajib300602" target="_blank">LinkedIn</a></p>
-      <p>🔗 <a href="https://github.com/balajib3006" target="_blank">GitHub</a></p>
+      <p><i class="fas fa-phone fa-fw"></i> +91 9159875082</p>
+      <p><i class="fas fa-envelope fa-fw"></i> balaji3006@outlook.in</p>
+      <p><i class="fas fa-envelope fa-fw"></i> balajib@rangsonsaerospace.com</p>
+      <p><i class="fas fa-map-marker-alt fa-fw"></i> Bengaluru, Karnataka, 5600278, India</p>
     </div>
 
-    <!-- Action buttons -->
-    <div class="actions">
-      <button class="action-btn" onclick="downloadVCard()">Save to Contacts</button>
-      <button class="action-btn" onclick="shareCard()">Share</button>
+    <!-- Social Links -->
+    <div class="btn-row social-buttons">
+      <a href="https://www.linkedin.com/in/balajib300602" target="_blank" class="btn">
+        <i class="fab fa-linkedin"></i>
+        <span>LinkedIn</span>
+      </a>
+      <a href="https://github.com/balajib3006" target="_blank" class="btn">
+        <i class="fab fa-github"></i>
+        <span>GitHub</span>
+      </a>
+    </div>
+
+    <!-- Share -->
+    <div class="btn-row">
+      <button class="btn" onclick="shareCard()">
+        <i class="fas fa-share-alt"></i>
+        <span>Share Card</span>
+      </button>
     </div>
 
     <!-- QR Code -->
@@ -51,12 +78,6 @@
       <p>Scan to Save Contact</p>
     </div>
   </div>
-
-  <!-- Floating Save Contact FAB -->
-  <button class="fab" onclick="downloadVCard()">💾</button>
-
-  <!-- Floating WhatsApp FAB -->
-  <a href="https://wa.me/919159875082" class="fab-whatsapp" target="_blank">💬</a>
 
   <script src="script.js"></script>
 </body>
