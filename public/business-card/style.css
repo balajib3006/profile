@@ -23,7 +23,7 @@ body {
 /* Card */
 .card {
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  padding: 0.75rem;
+  padding: 1rem;
   border-radius: var(--radius-lg, 20px);
   box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.6));
   max-width: 600px;
@@ -34,7 +34,7 @@ body {
   border: 1px solid rgba(255,255,255,0.03);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .card img.logo {
@@ -234,7 +234,6 @@ h2 {
 @media (max-width: 540px) {
   body {
     padding: 0.5rem;
-    min-height: 100dvh;
   }
 
   .card {
@@ -242,23 +241,21 @@ h2 {
     border-radius: 15px;
     max-width: 100%;
     gap: 0.5rem;
-    height: calc(100dvh - 1rem);
-    overflow: hidden;
   }
 
   .profile-photo {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 0.25rem;
+    width: 90px;
+    height: 90px;
+    margin-bottom: 0.5rem;
   }
   
   h1 { 
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     margin-bottom: 0.25rem;
   }
   
   h2 { 
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     line-height: 1.3;
     margin: 0;
   }
@@ -266,45 +263,67 @@ h2 {
   .btn-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.4rem;
-    padding: 0 0.5rem;
+    gap: 0.5rem;
+    padding: 0.5rem;
     margin: 0.25rem 0;
   }
 
   .btn {
     width: 100%;
-    min-height: 36px;
-    font-size: 0.8rem;
-    padding: 0.4rem;
+    min-height: 44px;
+    font-size: 0.9rem;
+    padding: 0.6rem;
   }
 
-  .btn i {
-    font-size: 0.9rem;
+  .social-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .social-buttons .btn {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .qr img {
+    width: 150px;
   }
 
   .info {
-    padding: 0.25rem;
+    padding: 0.5rem;
   }
 
   .info p {
     width: 100%;
     max-width: 280px;
-    margin: 0.2rem 0;
-    font-size: 0.85rem;
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
   }
 
   .info i {
+    font-size: 1.1rem;
+  }
+
+  .action-btn {
+    width: 100%;
+    max-width: 280px;
+    padding: 0.75rem 1rem;
+  }
+
+  .qr {
+    margin-top: 1.5rem;
+  }
+
+  .qr img {
+    width: 130px;
+    padding: 6px;
+  }
+
+  .action-btn {
+    min-height: 48px;
     font-size: 1rem;
-  }
-
-  .share-wrapper {
-    margin: 0.25rem 0;
-  }
-
-  .share-btn {
-    min-width: 120px;
-    font-size: 0.85rem;
-    padding: 0.4rem 1rem;
+    padding: 0.75rem;
   }
 }
 
