@@ -23,16 +23,18 @@ body {
 /* Card */
 .card {
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  /* reduced padding to make the card more compact */
-  padding: calc(var(--spacing-md, 1rem));
+  padding: 1rem;
   border-radius: var(--radius-lg, 20px);
   box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.6));
-  max-width: 540px;
+  max-width: 600px;
   width: 100%;
   text-align: center;
   color: var(--text-primary, #e6edf3);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .card img.logo {
@@ -107,23 +109,29 @@ h2 {
 /* Info */
 .info {
   text-align: center;
-  margin: calc(var(--spacing-sm, 0.6rem)) 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
+  padding: 0 0.75rem;
 }
 
 .info p {
   margin: 0;
-  padding: 0.3rem 0;
-  font-size: 0.95rem;
+  padding: 0.2rem 0;
+  font-size: 0.9rem;
   color: var(--text-secondary, #c9d1d9);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   min-width: 200px;
+}
+
+.info i {
+  width: 1rem;
+  color: var(--primary-color, #00bcd4);
 }
 
 .info a {
@@ -168,14 +176,42 @@ h2 {
   border-color: transparent;
 }
 
+/* Secondary Buttons (LinkedIn, GitHub) */
+.social-buttons {
+  margin-top: 0.25rem;
+  padding: 0 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.social-buttons .btn {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.1);
+  padding: 0.5rem 1rem;
+}
+
+/* Share Button */
+.share-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem 0;
+  padding: 0 0.75rem;
+}
+
+.share-btn {
+  min-width: 140px;
+  background: rgba(255,255,255,0.05);
+}
+
 /* QR */
 .qr {
-  /* smaller top gap to reduce overall card height */
-  margin-top: var(--spacing-lg, 2rem);
+  margin: 0;
+  padding: 0.5rem;
 }
 
 .qr img {
-  width: 170px;
+  width: 200px;
   border: 3px solid var(--primary-color, #00bcd4);
   border-radius: 12px;
   padding: 8px;
@@ -185,7 +221,7 @@ h2 {
 
 .qr img:hover {
   box-shadow: 0 0 15px rgba(59,130,246,0.12);
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .qr p {
@@ -201,15 +237,16 @@ h2 {
   }
 
   .card {
-    padding: 1rem;
+    padding: 0.75rem;
     border-radius: 15px;
     max-width: 100%;
+    gap: 0.5rem;
   }
 
   .profile-photo {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 0.75rem;
+    width: 90px;
+    height: 90px;
+    margin-bottom: 0.5rem;
   }
   
   h1 { 
@@ -219,32 +256,38 @@ h2 {
   
   h2 { 
     font-size: 0.9rem;
-    line-height: 1.4;
+    line-height: 1.3;
+    margin: 0;
   }
 
   .btn-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: 0.5rem;
     padding: 0.5rem;
-    margin: 0.75rem 0;
+    margin: 0.25rem 0;
   }
 
   .btn {
     width: 100%;
-    min-height: 48px; /* larger touch target for mobile */
-    font-size: 0.95rem;
-    padding: 0.75rem;
+    min-height: 44px;
+    font-size: 0.9rem;
+    padding: 0.6rem;
   }
 
-  .share-action {
-    padding: 0 0.5rem;
+  .social-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
   }
 
-  .share-btn {
-    width: 100%;
-    max-width: 280px;
-    min-height: 48px;
+  .social-buttons .btn {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .qr img {
+    width: 150px;
   }
 
   .info {
@@ -357,15 +400,16 @@ h2 {
   border-color: transparent;
 }
 
-/* Profile photo helper class used from main site */
+/* Profile photo */
 .profile-photo {
-  width: 86%;
-  height: 86%;
+  width: 110px;
+  height: 110px;
   object-fit: cover;
   border-radius: 50%;
-  border: 4px solid var(--primary-color);
+  border: 3px solid var(--primary-color);
   display: block;
-  margin: 0 auto var(--spacing-md, 1rem);
+  margin: 0.75rem auto 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
 }
 
 /* Make sure card children aren't using global h1/h2 styles too large */
