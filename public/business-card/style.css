@@ -24,10 +24,10 @@ body {
 /* Card */
 .card {
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  padding: 0.75rem;
+  padding: 1rem 0.75rem;
   border-radius: var(--radius-lg, 20px);
   box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.6));
-  max-width: 600px;
+  max-width: 360px;
   width: 100%;
   text-align: center;
   color: var(--text-primary, #e6edf3);
@@ -35,8 +35,8 @@ body {
   border: 1px solid rgba(255,255,255,0.03);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-height: 100vh;
+  gap: 0.4rem;
+  max-height: calc(100vh - 2rem);
   overflow: hidden;
 }
 
@@ -237,23 +237,35 @@ h2 {
 /* Mobile Optimizations */
 @media (max-width: 540px) {
   body {
-    padding: 4.5rem 0.5rem 0.5rem;
+    padding: 0.5rem;
+    height: 100vh;
+    align-items: center;
   }
 
   .card {
-    padding: 1rem 0.5rem;
+    padding: 0.75rem 0.5rem;
     border-radius: 15px;
     max-width: 100%;
     gap: 0.35rem;
-  }
-
-  .photo-wrapper {
-    top: 1.5rem;
+    margin: auto;
+    height: auto;
+    max-height: calc(100vh - 1rem);
   }
 
   .profile-photo {
     width: 80px;
     height: 80px;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.6rem;
+    min-height: 38px;
+  }
+  
+  .info p {
+    font-size: 0.85rem;
+    margin: 0.2rem 0;
   }
   
   h1 { 
@@ -414,24 +426,21 @@ h2 {
 }
 
 /* Photo wrapper and profile photo */
-.photo-wrapper {
-  position: fixed;
-  top: 2rem;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 10;
-  pointer-events: none;
+.card-header {
+  position: relative;
+  padding-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .profile-photo {
-  width: 90px;
-  height: 90px;
+  width: 85px;
+  height: 85px;
   object-fit: cover;
   border-radius: 50%;
   border: 2px solid var(--primary-color);
-  display: inline-block;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  display: block;
+  margin: 0 auto 0.5rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   background-color: var(--bg-primary, #0d1117);
 }
 
