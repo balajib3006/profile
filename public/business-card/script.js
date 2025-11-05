@@ -13,26 +13,12 @@ URL;TYPE=WhatsApp:https://wa.me/+919159875082
 REV:2024-01-01T00:00:00Z
 END:VCARD`;
 
-function handleContact(e) {
-  e.preventDefault();
-  
-  // Check if running on mobile
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  
-  if (isMobile) {
-    // On mobile, try to add to contacts directly
-    const contactUri = `begin:vcard${encodeURIComponent(vcardData.substring(10))}`;
-    window.location.href = `contacts:${contactUri}`;
-  } else {
-    // On desktop, show confirmation dialog
-    if (confirm('Download contact card (vCard)?')) {
-      const blob = new Blob([vcardData], { type: "text/vcard" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "Balaji_B.vcf";
-      link.click();
-    }
-  }
+function downloadVCard() {
+  const blob = new Blob([vcardData], { type: "text/vcard" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "Balaji_B.vcf";
+  link.click();
 }
 
 function shareCard() {
@@ -41,19 +27,10 @@ function shareCard() {
       title: 'Balaji B - Digital Card',
       text: 'Check out my digital visiting card',
       url: window.location.href
-    }).catch(err => {
-      console.log('Error sharing:', err);
-      copyToClipboard(window.location.href);
     });
   } else {
-    copyToClipboard(window.location.href);
+    alert("Sharing not supported on this browser. Copy the link manually.");
   }
-}
-
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text)
-    .then(() => alert('Link copied to clipboard!'))
-    .catch(() => alert('Please copy this link manually: ' + text));
 }
 
 // Generate QR Code

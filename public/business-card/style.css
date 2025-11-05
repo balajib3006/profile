@@ -85,24 +85,15 @@ h2 {
 
 /* Info */
 .info {
-  text-align: center;
+  text-align: left;
+  /* reduced vertical spacing for compact layout */
   margin: calc(var(--spacing-sm, 0.6rem)) 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .info p {
-  margin: 0;
-  padding: 0.3rem 0;
+  margin: 0.4rem 0;
   font-size: 0.95rem;
   color: var(--text-secondary, #c9d1d9);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-width: 200px;
 }
 
 .info a {
@@ -120,31 +111,29 @@ h2 {
 .actions {
   display: flex;
   justify-content: center;
+  gap: var(--spacing-sm, 0.5rem);
+  /* bring actions closer to the content */
   margin-top: var(--spacing-md, 0.9rem);
+  flex-wrap: wrap;
 }
 
 .action-btn {
-  border: 1px solid var(--primary-color, #00bcd4);
-  border-radius: 999px;
-  padding: 0.45rem 1.5rem;
-  color: var(--text-primary, #fff);
-  background: rgba(255,255,255,0.05);
+  flex: 1 1 auto;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-secondary, #2b3c55);
+  border: none;
+  color: var(--text-primary, white);
   cursor: pointer;
   font-size: 0.95rem;
-  transition: all var(--transition-normal, 0.3s);
-  min-width: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  transition: background var(--transition-normal, 0.3s), transform var(--transition-fast, 0.15s);
+  min-width: 120px;
 }
 
 .action-btn:hover {
   background: linear-gradient(90deg, var(--primary-color, #00bcd4), var(--accent-color, #f59e0b));
   color: var(--bg-primary, #0d1117);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  border-color: transparent;
+  box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1));
 }
 
 /* QR */
@@ -173,130 +162,105 @@ h2 {
   color: var(--text-secondary, #ccc);
 }
 
-/* Mobile Optimizations */
+/* Mobile */
 @media (max-width: 540px) {
-  body {
-    padding: 0.5rem;
-  }
-
   .card {
-    padding: 1rem;
-    border-radius: 15px;
-    max-width: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    /* reduced padding to make the card more compact */
+    padding: calc(var(--spacing-md, 1rem));
+    border-radius: var(--radius-lg, 20px);
+    box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.6));
+    max-width: 540px;
+    width: 100%;
+    text-align: center;
+    color: var(--text-primary, #e6edf3);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.03);
   }
 
-  .profile-photo {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 0.75rem;
+  .card img.logo {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: calc(var(--spacing-sm, 0.4rem));
+    border: 3px solid var(--primary-color, #00bcd4);
   }
   
-  h1 { 
-    font-size: 1.3rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  h2 { 
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-
-  .btn-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    padding: 0.5rem;
-    margin: 0.75rem 0;
-  }
-
-  .btn {
-    min-height: 48px; /* minimum touch target */
-    font-size: 0.95rem;
-    padding: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .info {
-    padding: 0.5rem;
-  }
-
-  .info p {
-    width: 100%;
-    max-width: 280px;
-    margin: 0.3rem 0;
-    font-size: 0.95rem;
-  }
-
-  .info i {
-    font-size: 1.1rem;
-  }
-
-  .action-btn {
-    width: 100%;
-    max-width: 280px;
-    padding: 0.75rem 1rem;
-  }
-
-  .qr {
-    margin-top: 1.5rem;
-  }
-
+  h1 { font-size: 1.3rem; }
+  h2 { font-size: 0.9rem; }
+  .btn { flex: 1 1 100%; text-align: center; }
+  .btn-row { flex-direction: column; gap: 8px; }
+  .action-btn { font-size: 0.85rem; padding: 8px; }
   .qr img {
-    width: 130px;
-    padding: 6px;
-  }
-
-  .action-btn {
-    min-height: 48px;
-    font-size: 1rem;
-    padding: 0.75rem;
+    width: 170px;
+    border: 3px solid var(--primary-color, #00bcd4);
+    border-radius: 12px;
+    padding: 8px;
+    background: var(--bg-primary, #fff);
+    transition: transform var(--transition-fast, 0.15s), box-shadow var(--transition-normal, 0.3s);
   }
 }
 
-/* Mobile Optimizations */
+/* FAB - Save Contact */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--primary-color, #00bcd4);
+  color: var(--bg-primary, #0d1117);
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+  display: none;
+  transition: transform var(--transition-fast, 0.15s), box-shadow var(--transition-normal, 0.3s);
+  z-index: 1000;
+}
+
+.fab:hover {
+  background: var(--primary-dark, #00a3bb);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: scale(1.05);
+}
+
+/* FAB - WhatsApp */
+.fab-whatsapp {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #25d366; /* keep WhatsApp green for recognizability */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  text-align: center;
+  line-height: 56px;
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+  text-decoration: none;
+  display: none;
+  transition: transform var(--transition-fast, 0.15s), box-shadow var(--transition-normal, 0.3s);
+  z-index: 1000;
+}
+
+.fab-whatsapp:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
 @media (max-width: 768px) {
-  .card { 
-    max-width: 360px;
-    padding: 1rem;
-  }
-  
-  .btn-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-    padding: 0 0.5rem;
-  }
-
-  .btn {
-    width: 100%;
+  .fab, .fab-whatsapp {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    font-size: 1rem;
   }
-
-  .btn i {
-    font-size: 1.2rem;
-  }
-
-  .actions {
-    padding: 0 0.5rem;
-  }
-
-  .action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-  }
+  .card { max-width: 360px; }
 }
 
 /* Profile photo helper class used from main site */

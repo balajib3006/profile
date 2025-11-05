@@ -7,8 +7,6 @@
   <!-- Load main theme first so variables are available, then local overrides -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="style.css">
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
   <div class="card">
@@ -24,24 +22,11 @@
     <h1>Balaji B</h1>
     <h2>Associate Engineer<br>Rangsons Aerospace Pvt Ltd</h2>
 
-    <!-- Quick Actions -->
+    <!-- Quick Buttons -->
     <div class="btn-row">
-      <a href="tel:+919159875082" class="btn">
-        <i class="fas fa-phone"></i>
-        <span>Call</span>
-      </a>
-      <a href="https://wa.me/919159875082" class="btn">
-        <i class="fab fa-whatsapp"></i>
-        <span>WhatsApp</span>
-      </a>
-      <a href="mailto:balajib@rangsonsaerospace.com" class="btn">
-        <i class="fas fa-envelope"></i>
-        <span>Email</span>
-      </a>
-      <a href="#" class="btn" onclick="handleContact(event)">
-        <i class="fas fa-address-card"></i>
-        <span>Save Contact</span>
-      </a>
+      <a href="tel:+919159875082" class="btn">📞 Call</a>
+      <a href="https://wa.me/919159875082" class="btn">💬 WhatsApp</a>
+      <a href="mailto:balajib@rangsonsaerospace.com" class="btn">✉️ Mail</a>
     </div>
 
     <!-- Contact Info -->
@@ -68,6 +53,12 @@
       <p>Scan to Save Contact</p>
     </div>
   </div>
+
+  <!-- Floating Save Contact FAB -->
+  <button class="fab" onclick="downloadVCard()">💾</button>
+
+  <!-- Floating WhatsApp FAB -->
+  <a href="https://wa.me/919159875082" class="fab-whatsapp" target="_blank">💬</a>
 
   <script src="script.js"></script>
 </body>
