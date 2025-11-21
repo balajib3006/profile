@@ -2,7 +2,7 @@ services:
   - type: web
     name: portfolio-backend
     env: node
-    buildCommand: npm install
+    buildCommand: npm install && npm rebuild bcrypt --build-from-source
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -14,3 +14,4 @@ services:
       - key: ALLOWED_ORIGINS
         value: https://yourusername.github.io,https://your-custom-domain.com
     healthCheckPath: /api/health
+

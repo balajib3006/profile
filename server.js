@@ -78,5 +78,27 @@ app.use((req, res) => {
 
 // Start Server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log('========================================');
+    console.log(`✅ Server is running on port ${PORT}`);
+    console.log(`✅ Environment: ${NODE_ENV}`);
+    console.log(`✅ CORS Origins: ${process.env.ALLOWED_ORIGINS || 'Development mode (all origins)'}`);
+    console.log('========================================');
 });
+
+// Global Error Handlers
+process.on('uncaughtException', (error) => {
+    console.error('❌ Uncaught Exception:', error);
+    console.error('Stack:', error.stack);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise);
+    console.error('Reason:', reason);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('📛 SIGTERM signal received: closing HTTP server');
+    process.exit(0);
+});
+
