@@ -1,4 +1,10 @@
+// API Configuration - Auto-detects local vs production
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '' // Use relative paths for same-origin requests in development
+  : (window.API_URL || ''); // Use window.API_URL if set (production), otherwise relative
+
 // Enhanced JavaScript with Advanced Parallax Scrolling Effects
+
 
 // Parallax Scrolling Manager
 class ParallaxManager {
@@ -19,21 +25,21 @@ class ParallaxManager {
     // Create parallax background container
     const parallaxBg = document.createElement('div');
     parallaxBg.className = 'parallax-bg';
-    
+
     // Create multiple parallax layers
     for (let i = 1; i <= 3; i++) {
       const layer = document.createElement('div');
       layer.className = `parallax-layer parallax-layer-${i}`;
       parallaxBg.appendChild(layer);
     }
-    
+
     document.body.insertBefore(parallaxBg, document.body.firstChild);
   }
 
   createFloatingParticles() {
     const particlesContainer = document.createElement('div');
     particlesContainer.className = 'floating-particles';
-    
+
     // Create 20 floating particles
     for (let i = 0; i < 20; i++) {
       const particle = document.createElement('div');
@@ -43,7 +49,7 @@ class ParallaxManager {
       particle.style.animationDuration = (15 + Math.random() * 10) + 's';
       particlesContainer.appendChild(particle);
     }
-    
+
     document.body.appendChild(particlesContainer);
   }
 
@@ -89,7 +95,7 @@ class ParallaxManager {
         const rect = el.getBoundingClientRect();
         const elementTop = rect.top + scrollTop;
         const elementHeight = rect.height;
-        
+
         // Check if element is in viewport
         if (elementTop < scrollTop + windowHeight && elementTop + elementHeight > scrollTop) {
           const yPos = -(scrollTop - elementTop) * speed;
@@ -174,7 +180,7 @@ class ScrollEffectsManager {
   }
 
   triggerAnimation(element) {
-    const triggerData = this.scrollTriggers.find(trigger => 
+    const triggerData = this.scrollTriggers.find(trigger =>
       element.matches(trigger.element)
     );
 
@@ -193,9 +199,9 @@ class ThemeManager {
   }
 
   init() {
-    const savedTheme = localStorage.getItem('theme') || 
-                       (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    
+    const savedTheme = localStorage.getItem('theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
     this.setTheme(savedTheme);
     this.bindEvents();
     this.setupThemeTransitions();
@@ -203,7 +209,7 @@ class ThemeManager {
 
   setTheme(theme) {
     const body = document.body;
-    
+
     if (theme === 'light') {
       body.classList.add('light-mode');
       this.icon?.classList.replace('fa-moon', 'fa-sun');
@@ -211,7 +217,7 @@ class ThemeManager {
       body.classList.remove('light-mode');
       this.icon?.classList.replace('fa-sun', 'fa-moon');
     }
-    
+
     localStorage.setItem('theme', theme);
     this.updateParallaxForTheme(theme);
   }
@@ -241,7 +247,7 @@ class ThemeManager {
   toggleTheme() {
     const isLightMode = document.body.classList.contains('light-mode');
     this.setTheme(isLightMode ? 'dark' : 'light');
-    
+
     // Add ripple effect to toggle button
     this.createRippleEffect();
   }
@@ -256,15 +262,15 @@ class ThemeManager {
       animation: ripple 0.6s linear;
       pointer-events: none;
     `;
-    
+
     const rect = this.themeToggle.getBoundingClientRect();
     const size = Math.max(rect.width, rect.height);
     ripple.style.width = ripple.style.height = size + 'px';
     ripple.style.left = rect.left + rect.width / 2 - size / 2 + 'px';
     ripple.style.top = rect.top + rect.height / 2 - size / 2 + 'px';
-    
+
     document.body.appendChild(ripple);
-    
+
     setTimeout(() => {
       document.body.removeChild(ripple);
     }, 600);
@@ -298,7 +304,7 @@ class NavigationManager {
         e.preventDefault();
         const targetId = link.getAttribute('href');
         const targetElement = document.querySelector(targetId);
-        
+
         if (targetElement) {
           this.smoothScrollTo(targetElement);
         }
@@ -347,7 +353,7 @@ class NavigationManager {
 
   handleScroll() {
     const scrollY = window.scrollY;
-    
+
     // Navbar effects
     if (this.navbar) {
       if (scrollY > 100) {
@@ -432,7 +438,7 @@ class AnimationManager {
       .section, .timeline-item, .skill-category, 
       .portfolio-item, .contact-item, .stat-item
     `);
-    
+
     animatedElements.forEach(element => {
       element.classList.add('fade-in');
       observer.observe(element);
@@ -452,19 +458,19 @@ class AnimationManager {
 
   setupSkillBarAnimations() {
     const skillBars = document.querySelectorAll('.skill-progress');
-    
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const progressBar = entry.target;
           const width = progressBar.style.width;
           progressBar.style.width = '0%';
-          
+
           setTimeout(() => {
             progressBar.style.width = width;
             progressBar.style.animation = 'progressFill 1.5s ease forwards';
           }, 300);
-          
+
           observer.unobserve(progressBar);
         }
       });
@@ -475,7 +481,7 @@ class AnimationManager {
 
   setupCounterAnimations() {
     const counters = document.querySelectorAll('.stat-number');
-    
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -500,7 +506,7 @@ class AnimationManager {
         current = target;
         clearInterval(timer);
       }
-      
+
       if (element.textContent.includes('+')) {
         element.textContent = Math.floor(current) + '+';
       } else {
@@ -511,12 +517,12 @@ class AnimationManager {
 
   setupTypewriterEffect() {
     const typewriterElements = document.querySelectorAll('.typewriter');
-    
+
     typewriterElements.forEach(element => {
       const text = element.textContent;
       element.textContent = '';
       element.style.borderRight = '2px solid var(--primary-color)';
-      
+
       let i = 0;
       const timer = setInterval(() => {
         element.textContent += text.charAt(i);
@@ -549,16 +555,16 @@ class PortfolioManager {
 
   setupPortfolioHoverEffects() {
     const portfolioItems = document.querySelectorAll('.portfolio-item');
-    
+
     portfolioItems.forEach(item => {
       item.addEventListener('mouseenter', (e) => {
         this.createHoverEffect(e.target);
       });
-      
+
       item.addEventListener('mousemove', (e) => {
         this.updateHoverEffect(e);
       });
-      
+
       item.addEventListener('mouseleave', (e) => {
         this.removeHoverEffect(e.target);
       });
@@ -568,7 +574,7 @@ class PortfolioManager {
   createHoverEffect(item) {
     const rect = item.getBoundingClientRect();
     const overlay = item.querySelector('.portfolio-overlay');
-    
+
     if (overlay) {
       overlay.style.background = `
         radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
@@ -583,7 +589,7 @@ class PortfolioManager {
     const rect = item.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
+
     item.style.setProperty('--mouse-x', x + '%');
     item.style.setProperty('--mouse-y', y + '%');
   }
@@ -600,7 +606,7 @@ class PortfolioManager {
     this.modal?.addEventListener('click', (e) => {
       if (e.target === this.modal) this.closeModal();
     });
-    
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.modal?.style.display === 'block') {
         this.closeModal();
@@ -671,7 +677,7 @@ class PortfolioManager {
     this.modalBody.innerHTML = this.generateModalContent(project);
     this.modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
-    
+
     // Add entrance animation
     this.modal.style.animation = 'modalFadeIn 0.3s ease';
     this.modal.querySelector('.modal-content').style.animation = 'modalSlideIn 0.3s ease';
@@ -733,7 +739,7 @@ class ContactManager {
 
   setupFormValidation() {
     const inputs = this.form?.querySelectorAll('input, textarea');
-    
+
     inputs?.forEach(input => {
       input.addEventListener('blur', () => this.validateField(input));
       input.addEventListener('input', () => this.clearFieldError(input));
@@ -798,125 +804,54 @@ class ContactManager {
     if (existingError) {
       existingError.remove();
     }
-    field.style.borderColor = '';
   }
 
   bindEvents() {
-    this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
-  }
+    this.form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  async handleSubmit(e) {
-    e.preventDefault();
-    
-    // Validate all fields
-    const inputs = this.form.querySelectorAll('input, textarea');
-    let isFormValid = true;
-    
-    inputs.forEach(input => {
-      if (!this.validateField(input)) {
-        isFormValid = false;
-      }
-    });
-
-    if (!isFormValid) {
-      this.showNotification('Please fix the errors above', 'error');
-      return;
-    }
-
-    const formData = new FormData(this.form);
-    const data = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      subject: formData.get('subject'),
-      message: formData.get('message')
-    };
-
-    const submitBtn = this.form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-    submitBtn.disabled = true;
-
-    try {
-      await this.simulateFormSubmission(data);
-      this.showNotification('Message sent successfully!', 'success');
-      this.form.reset();
+      // Validate all fields
+      const inputs = this.form.querySelectorAll('input, textarea');
+      let isValid = true;
       inputs.forEach(input => {
-        input.style.borderColor = '';
-        this.clearFieldError(input);
+        if (!this.validateField(input)) isValid = false;
       });
-    } catch (error) {
-      console.error('Form submission error:', error);
-      this.showNotification('Failed to send message. Please try again.', 'error');
-    } finally {
-      submitBtn.innerHTML = originalText;
-      submitBtn.disabled = false;
-    }
-  }
 
-  async simulateFormSubmission(data) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (Math.random() > 0.1) {
-          resolve(data);
+      if (!isValid) return;
+
+      const submitBtn = this.form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+      try {
+        const formData = new FormData(this.form);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch(`${API_BASE_URL}/api/contact`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('Message sent successfully!');
+          this.form.reset();
         } else {
-          reject(new Error('Simulated network error'));
+          alert('Failed to send message. Please try again.');
         }
-      }, 2000);
-    });
-  }
-
-  showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-      <div class="notification-content">
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        <span>${message}</span>
-        <button class="notification-close">&times;</button>
-      </div>
-    `;
-
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: ${type === 'success' ? '#10b981' : '#ef4444'};
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      z-index: 9999;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      max-width: 400px;
-    `;
-
-    document.body.appendChild(notification);
-
-    // Animate in
-    setTimeout(() => {
-      notification.style.transform = 'translateX(0)';
-    }, 100);
-
-    // Close button functionality
-    const closeBtn = notification.querySelector('.notification-close');
-    closeBtn.addEventListener('click', () => {
-      this.removeNotification(notification);
-    });
-
-    // Auto remove after delay
-    setTimeout(() => {
-      this.removeNotification(notification);
-    }, 5000);
-  }
-
-  removeNotification(notification) {
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (notification.parentNode) {
-        document.body.removeChild(notification);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again later.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
       }
-    }, 300);
+    });
   }
 }
 
@@ -936,7 +871,7 @@ class Utils {
 
   static throttle(func, limit) {
     let inThrottle;
-    return function() {
+    return function () {
       const args = arguments;
       const context = this;
       if (!inThrottle) {
@@ -961,8 +896,124 @@ function openPortfolioModal(projectId) {
   window.portfolioManager?.openModal(projectId);
 }
 
+// Data Fetching and Rendering
+async function loadPortfolioData() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/data`);
+    const data = await response.json();
+
+    if (data) {
+      renderAbout(data.about);
+      renderExperience(data.experience);
+      renderSkills(data.skills);
+      renderProjects(data.projects);
+    }
+  } catch (error) {
+    console.error('Error loading data:', error);
+  }
+}
+
+function renderAbout(about) {
+  if (!about) return;
+
+  const summaryEl = document.getElementById('about-summary');
+  if (summaryEl) summaryEl.innerHTML = about.summary || '';
+
+  const expYearsEl = document.getElementById('stat-experience');
+  if (expYearsEl) expYearsEl.textContent = about.experience_years || '1.9+';
+
+  const heroExpEl = document.getElementById('hero-experience-years');
+  if (heroExpEl) heroExpEl.textContent = about.experience_years || '1.9+';
+
+  const projectsEl = document.getElementById('stat-projects');
+  if (projectsEl) projectsEl.textContent = about.projects_completed || '50+';
+
+  const companiesEl = document.getElementById('stat-companies');
+  if (companiesEl) companiesEl.textContent = about.companies_count || '2';
+}
+
+function renderExperience(experience) {
+  const container = document.getElementById('experience-list');
+  if (!container || !experience) return;
+
+  container.innerHTML = experience.map(exp => `
+    <div class="timeline-item">
+      <div class="timeline-marker"></div>
+      <div class="timeline-content">
+        <div class="timeline-header">
+          <h3 class="job-title">${exp.title}</h3>
+          <span class="job-period">${exp.period}</span>
+        </div>
+        <div class="company">${exp.company}</div>
+        <ul class="job-responsibilities">
+          ${exp.responsibilities.map(resp => `<li>${resp}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderSkills(skills) {
+  const container = document.getElementById('skills-grid');
+  if (!container || !skills) return;
+
+  const categories = [...new Set(skills.map(s => s.category))];
+
+  container.innerHTML = categories.map(cat => `
+    <div class="skill-category">
+      <h3 class="category-title">
+        <i class="fas fa-code"></i>
+        ${cat}
+      </h3>
+      <div class="skills-list">
+        ${skills.filter(s => s.category === cat).map(skill => `
+          <div class="skill-item">
+            <span class="skill-name">${skill.name}</span>
+            <div class="skill-bar">
+              <div class="skill-progress" style="width: ${skill.level}%"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderProjects(projects) {
+  const container = document.getElementById('portfolio-grid');
+  if (!container || !projects) return;
+
+  container.innerHTML = projects.map(project => `
+    <div class="portfolio-item">
+      <div class="portfolio-image">
+        <img src="${project.image_url || 'https://via.placeholder.com/400x300'}" alt="${project.title}">
+        <div class="portfolio-overlay">
+          <div class="portfolio-actions">
+            <button class="portfolio-btn" onclick="openPortfolioModal('${project.id}')">
+              <i class="fas fa-eye"></i>
+            </button>
+            <a href="#" class="portfolio-btn" target="_blank">
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-content">
+        <h3 class="portfolio-title">${project.title}</h3>
+        <p class="portfolio-description">${project.description}</p>
+        <div class="portfolio-tags">
+          ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
+  // Load dynamic data
+  loadPortfolioData();
+
   // Initialize all managers
   window.parallaxManager = new ParallaxManager();
   window.scrollEffectsManager = new ScrollEffectsManager();

@@ -1,247 +1,163 @@
-8# Professional Portfolio Website
+# Portfolio with Admin Panel
 
-A modern, responsive portfolio website with a comprehensive admin panel for content management. Built with Flask, SQLite, and modern web technologies.
+A modern portfolio website with a full-featured admin panel for content management.
 
 ## Features
 
-### Frontend
-- **Responsive Design**: Mobile-first approach that works perfectly on all devices
-- **Modern UI/UX**: Clean, professional design with smooth animations
-- **Dark/Light Theme**: Toggle between themes with smooth transitions
-- **Interactive Elements**: Parallax scrolling, hover effects, and smooth animations
-- **Performance Optimized**: Lazy loading, optimized assets, and efficient code
+### Public Portfolio
+- Responsive design with premium UI/UX
+- Dynamic content loading from backend API
+- Skills, projects, experience, and contact sections
+- Modern animations and glassmorphism effects
 
 ### Admin Panel
-- **Complete Content Management**: Edit all website content through a user-friendly interface
-- **Profile Management**: Update personal information, contact details, and statistics
-- **Experience Management**: Add, edit, and reorder professional experiences
-- **Skills Management**: Manage technical skills with proficiency levels and categories
-- **Project Portfolio**: Add projects with images, technologies, and detailed descriptions
-- **Certifications**: Manage professional certifications and credentials
-- **Contact Messages**: View and manage messages from the contact form
-- **Secure Authentication**: Admin login with session management
+- Secure login with session management
+- CRUD operations for all content types
+- Premium dark theme UI matching public site aesthetic
+- Real-time content updates
 
-### Technical Features
-- **SQLite Database**: Lightweight, file-based database for easy deployment
-- **RESTful API**: Clean API endpoints for data management
-- **Form Validation**: Client and server-side validation
-- **Responsive Admin**: Admin panel works on all devices
-- **Data Export**: Easy backup and migration capabilities
+## Tech Stack
 
-## Technology Stack
+- **Frontend**: HTML, CSS, JavaScript
+- **Backend**: Node.js, Express.js
+- **Database**: SQLite (development), PostgreSQL (production)
+- **Authentication**: bcrypt + express-session
 
-### Backend
-- **Flask**: Python web framework
-- **SQLAlchemy**: Database ORM
-- **SQLite**: Database engine
-- **Werkzeug**: Security utilities
-
-### Frontend
-- **HTML5**: Semantic markup
-- **CSS3**: Modern styling with custom properties
-- **JavaScript ES6+**: Interactive functionality
-- **Font Awesome**: Icon library
-- **Google Fonts**: Typography
-
-## Installation
+## Local Development
 
 ### Prerequisites
-- Python 3.7 or higher
-- pip (Python package installer)
+- Node.js 18+ ([Download](https://nodejs.org/))
+- npm (comes with Node.js)
 
-### Setup Instructions
+### Setup
 
-1. **Clone or Download the Project**
+1. **Clone the repository**
    ```bash
-   # If using git
-   git clone <repository-url>
-   cd profile
-   
-   # Or download and extract the ZIP file
+   git clone https://github.com/yourusername/portfolio.git
+   cd portfolio
    ```
 
-2. **Create Virtual Environment** (Recommended)
+2. **Install dependencies**
    ```bash
-   python -m venv venv
-   
-   # Activate virtual environment
-   # On Windows:
-   venv\Scripts\activate
-   
-   # On macOS/Linux:
-   source venv/bin/activate
+   npm install
    ```
 
-3. **Install Dependencies**
+3. **Create environment file**
    ```bash
-   pip install -r requirements.txt
+   cp .env.example .env
+   ```
+   Edit `.env` and update the values
+
+4. **Start the server**
+   ```bash
+   npm run dev
    ```
 
-4. **Copy Static Assets**
-   Copy your existing images from `public/` to `static/images/`:
+5. **Access the application**
+   - Public Portfolio: `http://localhost:3000/`
+   - Admin Panel: `http://localhost:3000/admin/login.html`
+   - Default credentials: `admin` / `password123`
+
+## Deployment
+
+### Option 1: Deploy to Render (Recommended)
+
+1. Create account at [render.com](https://render.com)
+2. Create new **Web Service**
+3. Connect your GitHub repository
+4. Render will auto-detect `render.yaml`
+5. Add environment variables in Render dashboard
+6. Deploy!
+
+### Option 2: Deploy to Vercel
+
+1. Install Vercel CLI
    ```bash
-   # Create the images directory
-   mkdir static\images
-   
-   # Copy your images
-   copy public\*.jpg static\images\
-   copy public\*.png static\images\
+   npm i -g vercel
    ```
 
-5. **Run the Application**
+2. Deploy
    ```bash
-   python app.py
+   vercel
    ```
 
-6. **Access the Website**
-   - Main website: http://localhost:5000
-   - Admin panel: http://localhost:5000/admin/login
+3. Set environment variables in Vercel dashboard
 
-## Default Admin Credentials
+### Option 3: GitHub Pages (Static Frontend Only)
 
-- **Username**: admin
-- **Password**: admin123
+For static portfolio without admin panel:
+1. Enable GitHub Pages in repository settings
+2. Select `main` branch as source
+3. Access at `https://yourusername.github.io/portfolio/`
 
-**⚠️ Important**: Change these credentials immediately after first login!
+> Note: GitHub Pages only supports static sites. For full CMS functionality, deploy backend to Render/Vercel.
+
+## Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `PORT` | Server port | `3000` |
+| `NODE_ENV` | Environment | `development` or `production` |
+| `SESSION_SECRET` | Session encryption key | Random string |
+| `ALLOWED_ORIGINS` | CORS allowed origins | `https://yourdomain.com` |
+| `DATABASE_URL` | PostgreSQL URL (production) | `postgresql://...` |
 
 ## Project Structure
 
 ```
-profile/
-├── app.py                 # Main Flask application
-├── requirements.txt       # Python dependencies
-├── README.md             # This file
-├── portfolio.db          # SQLite database (created automatically)
-├── templates/            # HTML templates
-│   ├── base.html
-│   ├── index.html
-│   └── admin/           # Admin panel templates
-├── static/              # Static assets
+portfolio/
+├── admin/                 # Admin panel frontend
 │   ├── css/
-│   │   ├── style.css    # Main stylesheet
-│   │   └── admin.css    # Admin panel styles
 │   ├── js/
-│   │   ├── script.js    # Main JavaScript
-│   │   └── admin.js     # Admin panel JavaScript
-│   ├── images/          # Image assets
-│   └── uploads/         # User uploaded files
-└── public/              # Original files (can be removed after migration)
+│   └── *.html
+├── public/               # Public portfolio frontend  
+│   ├── style.css
+│   ├── script.js
+│   └── index.html
+├── routes/               # API routes
+│   ├── auth.js
+│   ├── admin.js
+│   └── index.js
+├── database.js           # Database initialization
+├── server.js             # Express server
+└── package.json          # Dependencies
+
 ```
 
-## Configuration
+## API Endpoints
 
-### Database
-The application uses SQLite by default. The database file (`portfolio.db`) is created automatically on first run.
+### Authentication
+- `POST /api/auth/login` - Admin login
+- `GET /api/auth/check` - Check auth status
+- `GET /api/auth/logout` - Logout
 
-### Environment Variables
-You can set these environment variables for production:
+### Content Management (Protected)
+- `GET/POST/PUT/DELETE /api/admin/skills`
+- `GET/POST/PUT/DELETE /api/admin/projects`
+- `GET/POST/PUT/DELETE /api/admin/experience`
+- `GET/POST/PUT/DELETE /api/admin/messages`
 
-```bash
-export FLASK_ENV=production
-export SECRET_KEY=your-very-secure-secret-key
-```
+### Public Data
+- `GET /api/data` - Get all portfolio data
 
-### Customization
-1. **Colors and Styling**: Edit `static/css/style.css` and `static/css/admin.css`
-2. **Content**: Use the admin panel to update all content
-3. **Images**: Upload images to `static/images/` and reference them in the admin panel
+## Security Notes
 
-## Admin Panel Usage
+> ⚠️ **Important for Production:**
+> - Change default admin password
+> - Use strong `SESSION_SECRET`
+> - Enable HTTPS (set `secure: true` for cookies)
+> - Add rate limiting for API endpoints
+> - Use PostgreSQL instead of SQLite
+> - Regularly backup your database
 
-### First Time Setup
-1. Go to http://localhost:5000/admin/login
-2. Login with default credentials (admin/admin123)
-3. Update your profile information
-4. Add your experiences, skills, and projects
-5. Customize the content to match your profile
+## License
 
-### Managing Content
-- **Profile**: Update personal information and statistics
-- **Experience**: Add work history with detailed responsibilities
-- **Skills**: Organize skills by category with proficiency levels
-- **Projects**: Showcase your work with images and descriptions
-- **Certifications**: Display professional credentials
-- **Messages**: View contact form submissions
+ISC
 
-## Deployment
+## Author
 
-### Local Development
-The application runs on http://localhost:5000 by default.
-
-### Production Deployment
-For production deployment, consider:
-
-1. **Use a production WSGI server** (like Gunicorn)
-2. **Set environment variables** for security
-3. **Use a reverse proxy** (like Nginx)
-4. **Enable HTTPS**
-5. **Regular database backups**
-
-Example with Gunicorn:
-```bash
-pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:8000 app:app
-```
-
-## Security Considerations
-
-1. **Change default admin credentials**
-2. **Use strong secret keys**
-3. **Enable HTTPS in production**
-4. **Regular security updates**
-5. **Input validation and sanitization**
-
-## Browser Support
-
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Performance Features
-
-- **Responsive Images**: Optimized for different screen sizes
-- **Lazy Loading**: Images load as needed
-- **Minified Assets**: Compressed CSS and JavaScript
-- **Efficient Database Queries**: Optimized data retrieval
-- **Caching Headers**: Browser caching for static assets
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Database Errors**
-   - Delete `portfolio.db` and restart the application
-   - Check file permissions
-
-2. **Static Files Not Loading**
-   - Ensure files are in the correct `static/` directories
-   - Check file paths in templates
-
-3. **Admin Panel Access Issues**
-   - Verify credentials
-   - Check session configuration
-
-4. **Mobile Display Issues**
-   - Clear browser cache
-   - Test in different browsers
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull 
-
-## Support
-
-For support and questions:
-1. Check the troubleshooting section
-2. Review the code documentation
-3. Create an issue in the repository
+Balaji B
 
 ---
 
-**Note**: This portfolio website is designed to be easily customizable and deployable. The admin panel makes it simple to update content without touching code, making it perfect for professionals who want a modern web presence with easy content management.
+Made with ❤️ using Node.js & Express

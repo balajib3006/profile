@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-bolt" style="color: var(--primary-color); font-size: 1.5rem;"></i>
+                <h2>Admin</h2>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/admin/dashboard.html">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/edit-about.html">
+                        <i class="fas fa-user"></i> About
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/edit-experience.html">
+                        <i class="fas fa-briefcase"></i> Experience
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/edit-skills.html">
+                        <i class="fas fa-code"></i> Skills
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/edit-projects.html">
+                        <i class="fas fa-project-diagram"></i> Projects
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/messages.html" class="active">
+                        <i class="fas fa-envelope"></i> Messages
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-danger btn-sm" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 class="page-title">Inbox</h1>
+            </header>
+
+            <div class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Messages</h3>
+                    </div>
+                    <div id="messages-list" class="item-list">
+                        <!-- Dynamic Content -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/admin/js/admin.js"></script>
+    <script>
+        checkAuth();
+        loadMessagesData();
+    </script>
+</body>
+
+</html>
