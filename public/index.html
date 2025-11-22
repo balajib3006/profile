@@ -44,7 +44,7 @@
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-logo">
-        <span>Balaji B</span>
+        <span id="nav-logo-name">Balaji B</span>
       </div>
       <div class="nav-menu">
         <a href="#about" class="nav-link">About</a>
@@ -55,17 +55,24 @@
       </div>
       <div class="nav-actions">
         <div class="social-icons">
-          <a href="https://github.com/balajib3006" target="_blank" aria-label="GitHub" class="social-link">
-            <i class="fab fa-github"></i>
-          </a>
-          <a href="https://orcid.org/0009-0001-5586-0951" target="_blank" aria-label="ORCID" class="social-link">
-            <i class="fab fa-orcid"></i>
-          </a>
-          <a href="https://linkedin.com/in/balajib300602" target="_blank" aria-label="LinkedIn" class="social-link">
+          <!-- Social icons visible but with placeholder links (not connected to admin panel) -->
+          <a href="#" target="_blank" aria-label="LinkedIn" class="social-link">
             <i class="fab fa-linkedin"></i>
           </a>
+          <a href="#" target="_blank" aria-label="GitHub" class="social-link">
+            <i class="fab fa-github"></i>
+          </a>
+          <a href="#" target="_blank" aria-label="GitLab" class="social-link">
+            <i class="fab fa-gitlab"></i>
+          </a>
+          <a href="#" target="_blank" aria-label="ORCID" class="social-link">
+            <i class="fab fa-orcid"></i>
+          </a>
+          <a href="#" target="_blank" aria-label="Google Scholar" class="social-link">
+            <i class="fas fa-graduation-cap"></i>
+          </a>
         </div>
-        <!-- Open business card in a new tab instead of direct vCard/resume/theme controls -->
+        <!-- Open business card in a new tab -->
         <a href="business-card/index.html" class="action-btn" target="_blank" rel="noopener"
           aria-label="Open Business Card">
           <i class="fas fa-address-card"></i>
@@ -81,10 +88,10 @@
         <div class="hero-text">
           <h1 class="hero-title">
             <span class="title-line">Hi, I'm</span>
-            <span class="title-name">Balaji B</span>
+            <span class="title-name" id="hero-name">Balaji B</span>
           </h1>
           <p class="hero-subtitle">Associate Engineer</p>
-          <p class="hero-description">
+          <p class="hero-description" id="hero-bio">
             Specialized in hardware design, PCB development, and antenna systems with <span
               id="hero-experience-years">1.9+</span> years of experience
             delivering innovative electronic solutions for aerospace and advanced composites industries.
@@ -102,7 +109,7 @@
         </div>
         <div class="hero-image">
           <div class="image-container">
-            <img src="profile-photo.jpg" alt="Balaji B - Associate Engineer" class="profile-photo">
+            <img src="#" alt="Balaji B - Associate Engineer" class="profile-photo" id="hero-profile-picture">
             <div class="image-decoration"></div>
           </div>
         </div>
@@ -257,7 +264,7 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-text">
-          <p>&copy; 2024 Balaji B. All rights reserved.</p>
+          <p>&copy; <span id="footer-year">2024</span> <span id="footer-name">Balaji B</span>. All rights reserved.</p>
         </div>
         <div class="footer-links">
           <a href="#about">About</a>
@@ -279,6 +286,32 @@
   </div>
 
   <script src="script.js"></script>
+</body>
+
+</html>
+<div class="footer-text">
+  <p>&copy; 2024 Balaji B. All rights reserved.</p>
+</div>
+<div class="footer-links">
+  <a href="#about">About</a>
+  <a href="#experience">Experience</a>
+  <a href="#skills">Skills</a>
+  <a href="#portfolio">Portfolio</a>
+  <a href="#contact">Contact</a>
+</div>
+</div>
+</div>
+</footer>
+
+<!-- Portfolio Modal -->
+<div id="portfolio-modal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 
 </html>

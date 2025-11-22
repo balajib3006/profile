@@ -92,6 +92,107 @@ if (logoutBtn) {
     });
 }
 
+// --- Personal Details Section ---
+async function loadPersonalDetailsData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/personal-details`, { credentials: 'include' });
+        const data = await response.json();
+
+        if (data && Object.keys(data).length > 0) {
+            // Populate text fields
+            const fields = ['name', 'email', 'phone', 'location', 'bio', 'work_contact',
+                'portfolio_url', 'linkedin_url', 'github_url', 'gitlab_url',
+                'orcid_url', 'google_scholar_url'];
+
+            fields.forEach(field => {
+                const element = document.getElementById(field);
+                if (element) element.value = data[field] || '';
+            });
+
+            // Handle profile picture preview
+            if (data.profile_picture) {
+                const previewWrapper = document.getElementById('profile-preview-wrapper');
+                const imageActions = document.getElementById('image-actions');
+                const fileNameDisplay = document.getElementById('file-name-display');
+
+                if (previewWrapper) {
+                    previewWrapper.innerHTML = `<img src="/uploads/profile/${data.profile_picture}" class="profile-preview" alt="Profile Picture">`;
+                }
+                if (imageActions) imageActions.style.display = 'flex';
+                if (fileNameDisplay) fileNameDisplay.textContent = `Current: ${data.profile_picture}`;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading personal details:', error);
+    }
+}
+
+// Image Preview Handler
+const profileInput = document.getElementById('profile_picture');
+if (profileInput) {
+    profileInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File is too large. Maximum size is 5MB.');
+                this.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const previewWrapper = document.getElementById('profile-preview-wrapper');
+                if (previewWrapper) {
+                    previewWrapper.innerHTML = `<img src="${e.target.result}" class="profile-preview" alt="Preview">`;
+                }
+
+                const fileNameDisplay = document.getElementById('file-name-display');
+                if (fileNameDisplay) fileNameDisplay.textContent = `Selected: ${file.name}`;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Form Submission Handler
+const editPersonalForm = document.getElementById('edit-personal-form');
+if (editPersonalForm) {
+    editPersonalForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = editPersonalForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const formData = new FormData(editPersonalForm);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/personal-details`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData // Send as FormData for file upload
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Personal details saved successfully!');
+                loadPersonalDetailsData(); // Reload to show updated data/image
+            } else {
+                alert('Error saving data: ' + (result.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error saving personal details:', error);
+            alert('Error saving data. Please check console for details.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+}
+
 // --- About Section ---
 async function loadAboutData() {
     try {

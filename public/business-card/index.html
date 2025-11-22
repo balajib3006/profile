@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balaji B - Digital Business Card</title>
+  <!-- Load main theme first so variables are available, then local overrides -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+<body>
+  <div class="card">
+    <div class="card-header">
+      <img src="#" alt="Balaji B - Associate Engineer" class="profile-photo" id="card-profile-picture">
+      <!-- Name + Title -->
+      <h1 id="card-name">Balaji B</h1>
+      <h2 id="card-title">Associate Engineer<br>Rangsons Aerospace Pvt Ltd</h2>
+
+      <!-- Quick Actions -->
+      <div class="btn-row">
+        <a href="tel:+919159875082" class="btn" id="card-phone-btn">
+          <i class="fas fa-phone"></i>
+          <span>Call</span>
+        </a>
+        <a href="https://wa.me/919159875082" class="btn" id="card-whatsapp-btn">
+          <i class="fab fa-whatsapp"></i>
+          <span>WhatsApp</span>
+        </a>
+        <a href="mailto:balajib@rangsonsaerospace.com" class="btn" id="card-email-btn">
+          <i class="fas fa-envelope"></i>
+          <span>Email</span>
+        </a>
+        <a href="https://www.linkedin.com/in/balajib300602" target="_blank" class="btn" id="card-linkedin-btn">
+          <i class="fab fa-linkedin-in"></i>
+          <span>LinkedIn</span>
+        </a>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="info">
+        <p id="card-phone-text"><i class="fas fa-phone"></i> +91 9159875082</p>
+        <p id="card-email-text"><i class="fas fa-envelope"></i> balaji3006@outlook.in</p>
+        <p id="card-work-email-text"><i class="fas fa-envelope"></i> balajib@rangsonsaerospace.com</p>
+        <p id="card-location-text"><i class="fas fa-map-marker-alt"></i> Bengaluru, Karnataka, 560027, India</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn primary-btn" onclick="handleContact(event)">
+          <i class="fas fa-user-plus"></i>
+          <span>Save Contact</span>
+        </button>
+        <button class="btn secondary-btn" onclick="shareCard()">
+          <i class="fas fa-share-alt"></i>
+          <span>Share</span>
+        </button>
+      </div>
+
+      <!-- QR Code -->
+      <div class="qr">
+        <img id="qrCode" alt="QR Code">
+        <p>Scan to Save Contact</p>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

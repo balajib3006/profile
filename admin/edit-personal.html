@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Details - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        .profile-upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .profile-preview-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .profile-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-preview-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed var(--border-color);
+        }
+
+        .profile-preview-placeholder i {
+            font-size: 3rem;
+            color: var(--text-muted);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .file-name-display {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        #image-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-bolt" style="color: var(--primary-color); font-size: 1.5rem;"></i>
+                <h2>Admin</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/admin/dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="/admin/edit-personal.html" class="active"><i class="fas fa-id-card"></i>
+                        Personal Details</a></li>
+                <li class="nav-item"><a href="/admin/edit-about.html"><i class="fas fa-user"></i> About</a></li>
+                <li class="nav-item"><a href="/admin/edit-experience.html"><i class="fas fa-briefcase"></i>
+                        Experience</a></li>
+                <li class="nav-item"><a href="/admin/edit-skills.html"><i class="fas fa-code"></i> Skills</a></li>
+                <li class="nav-item"><a href="/admin/edit-projects.html"><i class="fas fa-project-diagram"></i>
+                        Projects</a></li>
+                <li class="nav-item"><a href="/admin/messages.html"><i class="fas fa-envelope"></i> Messages</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-danger btn-sm" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 class="page-title">Personal Details</h1>
+                <div class="user-menu">
+                    <a href="/" target="_blank" class="btn btn-sm"
+                        style="border: 1px solid var(--border-color); color: var(--text-secondary);">
+                        <i class="fas fa-external-link-alt"></i> View Site
+                    </a>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit Your Personal Information</h3>
+                    </div>
+
+                    <form id="edit-personal-form" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-camera"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Profile
+                                Picture</label>
+                            <div class="profile-upload-container">
+                                <div class="profile-preview-container">
+                                    <div id="profile-preview-wrapper">
+                                        <div class="profile-preview-placeholder"><i class="fas fa-user"></i></div>
+                                    </div>
+                                    <div>
+                                        <div class="file-input-wrapper">
+                                            <label for="profile_picture" class="file-input-btn">
+                                                <i class="fas fa-upload"></i> <span id="upload-btn-text">Choose
+                                                    Image</span>
+                                            </label>
+                                            <input type="file" id="profile_picture" name="profile_picture"
+                                                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                                        </div>
+                                        <div id="file-name-display" class="file-name-display"></div>
+                                        <div id="image-actions" style="display: none; margin-top: 0.75rem;">
+                                            <button type="button" id="remove-picture-btn" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i> Remove Picture
+                                            </button>
+                                        </div>
+                                        <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">
+                                            <i class="fas fa-info-circle"></i> Max size: 5MB. Formats: JPG, PNG, GIF,
+                                            WebP
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="name"><i class="fas fa-user"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Full Name</label>
+                            <input type="text" id="name" name="name" class="form-control"
+                                placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email"><i class="fas fa-envelope"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Email
+                                Address</label>
+                            <input type="email" id="email" name="email" class="form-control"
+                                placeholder="your.email@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="phone"><i class="fas fa-phone"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-control"
+                                placeholder="+1 (234) 567-8900">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="location"><i class="fas fa-map-marker-alt"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Location</label>
+                            <input type="text" id="location" name="location" class="form-control"
+                                placeholder="City, Country">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="bio"><i class="fas fa-quote-left"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Bio /
+                                Tagline</label>
+                            <textarea id="bio" name="bio" class="form-control" rows="3"
+                                placeholder="A brief description about yourself"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="work_contact"><i class="fas fa-briefcase"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Work Contact
+                                Details</label>
+                            <input type="text" id="work_contact" name="work_contact" class="form-control"
+                                placeholder="Work email or contact information">
+                            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                                <i class="fas fa-info-circle"></i> Professional contact for business inquiries
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="portfolio_url"><i class="fas fa-globe"
+                                    style="margin-right: 0.5rem; color: var(--primary-color);"></i> Portfolio / Website
+                                URL</label>
+                            <input type="url" id="portfolio_url" name="portfolio_url" class="form-control"
+                                placeholder="https://yourportfolio.com">
+                            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                                <i class="fas fa-info-circle"></i> Link to your personal website or portfolio
+                            </small>
+                        </div>
+
+                        <div class="card" style="margin-top: 2rem; background: rgba(51, 65, 85, 0.3);">
+                            <div class="card-header" style="border-color: rgba(255, 255, 255, 0.05);">
+                                <h3 class="card-title"><i class="fas fa-share-alt"
+                                        style="margin-right: 0.5rem; color: var(--primary-color);"></i> Social Media &
+                                    Academic Links</h3>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="linkedin_url"><i class="fab fa-linkedin"
+                                        style="margin-right: 0.5rem; color: #0077b5;"></i> LinkedIn URL</label>
+                                <input type="url" id="linkedin_url" name="linkedin_url" class="form-control"
+                                    placeholder="https://linkedin.com/in/yourprofile">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="github_url"><i class="fab fa-github"
+                                        style="margin-right: 0.5rem; color: var(--text-primary);"></i> GitHub
+                                    URL</label>
+                                <input type="url" id="github_url" name="github_url" class="form-control"
+                                    placeholder="https://github.com/yourusername">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="gitlab_url"><i class="fab fa-gitlab"
+                                        style="margin-right: 0.5rem; color: #fc6d26;"></i> GitLab URL</label>
+                                <input type="url" id="gitlab_url" name="gitlab_url" class="form-control"
+                                    placeholder="https://gitlab.com/yourusername">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="orcid_url"><i class="fas fa-id-badge"
+                                        style="margin-right: 0.5rem; color: #a6ce39;"></i> ORCID URL</label>
+                                <input type="url" id="orcid_url" name="orcid_url" class="form-control"
+                                    placeholder="https://orcid.org/0000-0000-0000-0000">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="google_scholar_url"><i class="fas fa-graduation-cap"
+                                        style="margin-right: 0.5rem; color: #4285f4;"></i> Google Scholar URL</label>
+                                <input type="url" id="google_scholar_url" name="google_scholar_url" class="form-control"
+                                    placeholder="https://scholar.google.com/citations?user=YOUR_ID">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/admin/js/admin.js"></script>
+    <script>
+        checkAuth();
+        if (document.getElementById('edit-personal-form')) {
+            loadPersonalDetailsData();
+        }
+    </script>
+</body>
+
+</html>

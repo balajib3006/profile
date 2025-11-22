@@ -1009,10 +1009,145 @@ function renderProjects(projects) {
   `).join('');
 }
 
+// Load Personal Details and Profile Picture
+async function loadPersonalDetailsData() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/public/personal-details`);
+    const data = await response.json();
+
+    if (data && Object.keys(data).length > 0) {
+      // Update hero section name
+      if (data.name) {
+        const heroName = document.getElementById('hero-name');
+        if (heroName) heroName.textContent = data.name;
+
+        // Update navigation logo
+        const navLogoName = document.getElementById('nav-logo-name');
+        if (navLogoName) navLogoName.textContent = data.name;
+
+        // Update footer name
+        const footerName = document.getElementById('footer-name');
+        if (footerName) footerName.textContent = data.name;
+
+        // Update page title
+        document.title = `${data.name} - Professional Portfolio`;
+      }
+
+      // Update footer year to current year
+      const footerYear = document.getElementById('footer-year');
+      if (footerYear) footerYear.textContent = new Date().getFullYear();
+
+      // Update hero bio
+      if (data.bio) {
+        const heroBio = document.getElementById('hero-bio');
+        if (heroBio) heroBio.textContent = data.bio;
+      }
+
+      // Update profile picture
+      if (data.profile_picture) {
+        const profileImages = document.querySelectorAll('.profile-photo, #hero-profile-picture');
+        profileImages.forEach(img => {
+          img.src = `/uploads/profile/${data.profile_picture}`;
+          img.alt = data.name || 'Profile Picture';
+        });
+      }
+
+      // Update contact information
+      if (data.email) {
+        const emailElements = document.querySelectorAll('.contact-item .contact-details p');
+        emailElements.forEach(el => {
+          if (el.textContent.includes('@')) el.textContent = data.email;
+        });
+      }
+
+      if (data.phone) {
+        const phoneElements = document.querySelectorAll('.contact-item .contact-details p');
+        phoneElements.forEach(el => {
+          const parent = el.closest('.contact-details');
+          if (parent && parent.previousElementSibling) {
+            const icon = parent.previousElementSibling.querySelector('i');
+            if (icon && icon.classList.contains('fa-phone')) {
+              el.textContent = data.phone;
+            }
+          }
+        });
+      }
+
+      if (data.location) {
+        const locationElements = document.querySelectorAll('.contact-item .contact-details p');
+        locationElements.forEach(el => {
+          const parent = el.closest('.contact-details');
+          if (parent && parent.previousElementSibling) {
+            const icon = parent.previousElementSibling.querySelector('i');
+            if (icon && icon.classList.contains('fa-map-marker-alt')) {
+              el.textContent = data.location;
+            }
+          }
+        });
+      }
+
+      // Update social media links - DISABLED (keeping static placeholder links)
+      // updateSocialMediaLinks(data);
+    }
+  } catch (error) {
+    console.error('Error loading personal details:', error);
+  }
+}
+
+// Update Social Media Links
+function updateSocialMediaLinks(data) {
+  // GitHub
+  if (data.github_url) {
+    const githubLink = document.querySelector('#nav-github');
+    if (githubLink) githubLink.href = data.github_url;
+  }
+
+  // LinkedIn
+  if (data.linkedin_url) {
+    const linkedinLink = document.querySelector('#nav-linkedin');
+    if (linkedinLink) linkedinLink.href = data.linkedin_url;
+  }
+
+  // ORCID
+  if (data.orcid_url) {
+    const orcidLink = document.querySelector('#nav-orcid');
+    if (orcidLink) orcidLink.href = data.orcid_url;
+  }
+
+  // Google Scholar (show if URL provided)
+  if (data.google_scholar_url) {
+    const scholarLink = document.querySelector('#nav-scholar');
+    if (scholarLink) {
+      scholarLink.href = data.google_scholar_url;
+      scholarLink.style.display = '';
+    }
+  }
+
+  // GitLab (add dynamically if provided)
+  if (data.gitlab_url) {
+    const socialIcons = document.querySelector('.nav-actions .social-icons');
+    let gitlabLink = document.querySelector('#nav-gitlab');
+
+    if (!gitlabLink && socialIcons) {
+      gitlabLink = document.createElement('a');
+      gitlabLink.href = data.gitlab_url;
+      gitlabLink.target = '_blank';
+      gitlabLink.setAttribute('aria-label', 'GitLab');
+      gitlabLink.className = 'social-link';
+      gitlabLink.id = 'nav-gitlab';
+      gitlabLink.innerHTML = '<i class="fab fa-gitlab"></i>';
+      socialIcons.appendChild(gitlabLink);
+    } else if (gitlabLink) {
+      gitlabLink.href = data.gitlab_url;
+    }
+  }
+}
+
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
   // Load dynamic data
   loadPortfolioData();
+  loadPersonalDetailsData();
 
   // Initialize all managers
   window.parallaxManager = new ParallaxManager();

@@ -27,6 +27,24 @@ function initDatabase() {
             }
         });
 
+        // Personal Details Table
+        db.run(`CREATE TABLE IF NOT EXISTS personal_details (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            email TEXT,
+            phone TEXT,
+            location TEXT,
+            bio TEXT,
+            work_contact TEXT,
+            portfolio_url TEXT,
+            linkedin_url TEXT,
+            github_url TEXT,
+            gitlab_url TEXT,
+            orcid_url TEXT,
+            google_scholar_url TEXT,
+            profile_picture TEXT
+        )`);
+
         // About Table
         db.run(`CREATE TABLE IF NOT EXISTS about (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

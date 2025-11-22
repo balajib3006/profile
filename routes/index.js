@@ -8,6 +8,14 @@ router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// API Endpoint to get personal details
+router.get('/api/public/personal-details', (req, res) => {
+    db.get("SELECT * FROM personal_details ORDER BY id DESC LIMIT 1", (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(row || {});
+    });
+});
+
 // API Endpoint to get all portfolio data
 router.get('/api/data', (req, res) => {
     const data = {};
