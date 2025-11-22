@@ -18,7 +18,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // CORS Configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+    : ['http://localhost:3000,https://profile-warm.onrender.com/'];
 
 app.use(cors({
     origin: (origin, callback) => {
