@@ -16,23 +16,40 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
 // CORS Configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:3000,https://profile-warm.onrender.com/'];
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://profile-warm.onrender.com';
 
-app.use(cors({
-    origin: (origin, callback) => {
-        // Allow requests with no origin (mobile apps, Postman, etc.)
+// List the known allowed origins here, plus any others you need
+const whitelist = [
+    'http://localhost:3000',
+    'https://balajib3006.github.io',
+    FRONTEND_URL,
+    // add variants if needed:
+    // 'https://www.profile-warm.onrender.com'
+];
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Log the incoming origin for debugging (will appear in Render logs)
+        console.log('CORS check - Origin:', origin);
+
+        // allow requests with no origin (curl, server-to-server)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1 || NODE_ENV === 'development') {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+        // Exact match against whitelist
+        if (whitelist.indexOf(origin) !== -1) {
+            return callback(null, true);
         }
+
+        // Not allowed
+        const err = new Error('Not allowed by CORS');
+        err.status = 403;
+        return callback(err);
     },
-    credentials: true
-}));
+    credentials: true,
+    exposedHeaders: ['Content-Length', 'X-Kuma-Revision'] // optional
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
