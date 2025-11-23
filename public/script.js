@@ -1,1266 +1,248 @@
 // API Configuration - Auto-detects local vs production
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? '' // Use relative paths for same-origin requests in development
-  : (window.API_URL || ''); // Use window.API_URL if set (production), otherwise relative
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? '' // development uses relative paths
+  : (window.API_URL || ''); // production can set window.API_URL
 
-// Enhanced JavaScript with Advanced Parallax Scrolling Effects
-
-
-// Parallax Scrolling Manager
-class ParallaxManager {
-  constructor() {
-    this.parallaxElements = [];
-    this.isScrolling = false;
-    this.init();
-  }
-
-  init() {
-    this.createParallaxBackground();
-    this.createFloatingParticles();
-    this.setupParallaxElements();
-    this.bindEvents();
-  }
-
-  createParallaxBackground() {
-    // Create parallax background container
-    const parallaxBg = document.createElement('div');
-    parallaxBg.className = 'parallax-bg';
-
-    // Create multiple parallax layers
-    for (let i = 1; i <= 3; i++) {
-      const layer = document.createElement('div');
-      layer.className = `parallax-layer parallax-layer-${i}`;
-      parallaxBg.appendChild(layer);
+// --- Data Manager ---
+class DataManager {
+  static async fetchData(endpoint) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/${endpoint}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Error fetching ${endpoint}:`, error);
+      return null;
     }
-
-    document.body.insertBefore(parallaxBg, document.body.firstChild);
   }
 
-  createFloatingParticles() {
-    const particlesContainer = document.createElement('div');
-    particlesContainer.className = 'floating-particles';
-
-    // Create 20 floating particles
-    for (let i = 0; i < 20; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 15 + 's';
-      particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-      particlesContainer.appendChild(particle);
-    }
-
-    document.body.appendChild(particlesContainer);
-  }
-
-  setupParallaxElements() {
-    // Define parallax elements with their scroll speeds
-    this.parallaxElements = [
-      { element: '.parallax-layer-1', speed: 0.2 },
-      { element: '.parallax-layer-2', speed: 0.5 },
-      { element: '.parallax-layer-3', speed: 0.3 },
-      { element: '.hero-image', speed: 0.1 },
-      { element: '.section-title', speed: 0.05 },
-      { element: '.timeline-marker', speed: 0.1 },
-      { element: '.skill-category', speed: 0.08 },
-      { element: '.portfolio-item', speed: 0.06 }
-    ];
-  }
-
-  bindEvents() {
-    // Use requestAnimationFrame for smooth scrolling
-    window.addEventListener('scroll', () => {
-      if (!this.isScrolling) {
-        requestAnimationFrame(() => {
-          this.updateParallax();
-          this.isScrolling = false;
-        });
-        this.isScrolling = true;
-      }
-    });
-
-    // Handle resize events
-    window.addEventListener('resize', Utils.debounce(() => {
-      this.updateParallax();
-    }, 100));
-  }
-
-  updateParallax() {
-    const scrollTop = window.pageYOffset;
-    const windowHeight = window.innerHeight;
-
-    this.parallaxElements.forEach(({ element, speed }) => {
-      const elements = document.querySelectorAll(element);
-      elements.forEach(el => {
-        const rect = el.getBoundingClientRect();
-        const elementTop = rect.top + scrollTop;
-        const elementHeight = rect.height;
-
-        // Check if element is in viewport
-        if (elementTop < scrollTop + windowHeight && elementTop + elementHeight > scrollTop) {
-          const yPos = -(scrollTop - elementTop) * speed;
-          el.style.transform = `translate3d(0, ${yPos}px, 0)`;
-        }
-      });
-    });
-
-    // Update background layers
-    const layers = document.querySelectorAll('.parallax-layer');
-    layers.forEach((layer, index) => {
-      const speed = 0.1 + (index * 0.1);
-      const yPos = scrollTop * speed;
-      layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
-    });
-  }
+  static async getAdminPanel() { return this.fetchData('admin-panel'); }
+  static async getPersonalDetails() { return this.fetchData('personal-details'); }
+  static async getAbout() { return this.fetchData('about'); }
+  static async getExperience() { return this.fetchData('experience'); }
+  static async getSkills() { return this.fetchData('skills'); }
+  static async getProjects() { return this.fetchData('projects'); }
+  static async getCertifications() { return this.fetchData('certifications'); }
+  static async getPublications() { return this.fetchData('publications'); }
 }
 
-// Advanced Scroll Effects Manager
-class ScrollEffectsManager {
-  constructor() {
-    this.scrollTriggers = [];
-    this.init();
-  }
-
-  init() {
-    this.setupScrollTriggers();
-    this.bindEvents();
-  }
-
-  setupScrollTriggers() {
-    // Define scroll-triggered animations
-    this.scrollTriggers = [
-      {
-        element: '.timeline-item',
-        animation: 'slideInFromRight',
-        offset: 0.8,
-        stagger: 200
-      },
-      {
-        element: '.skill-category',
-        animation: 'scaleIn',
-        offset: 0.7,
-        stagger: 150
-      },
-      {
-        element: '.portfolio-item',
-        animation: 'flipIn',
-        offset: 0.6,
-        stagger: 100
-      },
-      {
-        element: '.contact-item',
-        animation: 'bounceIn',
-        offset: 0.8,
-        stagger: 100
-      }
-    ];
-  }
-
-  bindEvents() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          this.triggerAnimation(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    });
-
-    // Observe all scroll trigger elements
-    this.scrollTriggers.forEach(trigger => {
-      const elements = document.querySelectorAll(trigger.element);
-      elements.forEach(el => {
-        el.classList.add('scroll-trigger');
-        observer.observe(el);
-      });
-    });
-  }
-
-  triggerAnimation(element) {
-    const triggerData = this.scrollTriggers.find(trigger =>
-      element.matches(trigger.element)
-    );
-
-    if (triggerData) {
-      element.classList.add('animate-in', triggerData.animation);
+// --- Render Functions ---
+const Renderer = {
+  renderPersonalDetails: (data) => {
+    if (!data) return;
+    if (data.name) {
+      const navLogo = document.getElementById('nav-logo-name');
+      if (navLogo) navLogo.textContent = data.name;
+      const heroName = document.getElementById('hero-name');
+      if (heroName) heroName.textContent = data.name;
+      const footerName = document.getElementById('footer-name');
+      if (footerName) footerName.textContent = data.name;
+      document.title = `${data.name} - Associate Engineer`;
     }
-  }
-}
-
-// Enhanced Theme Manager
-class ThemeManager {
-  constructor() {
-    this.themeToggle = document.getElementById('theme-toggle');
-    this.icon = this.themeToggle?.querySelector('i');
-    this.init();
-  }
-
-  init() {
-    const savedTheme = localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-
-    this.setTheme(savedTheme);
-    this.bindEvents();
-    this.setupThemeTransitions();
-  }
-
-  setTheme(theme) {
-    const body = document.body;
-
-    if (theme === 'light') {
-      body.classList.add('light-mode');
-      this.icon?.classList.replace('fa-moon', 'fa-sun');
-    } else {
-      body.classList.remove('light-mode');
-      this.icon?.classList.replace('fa-sun', 'fa-moon');
+    if (data.bio) {
+      const heroBio = document.getElementById('hero-bio');
+      if (heroBio) heroBio.textContent = data.bio;
     }
-
-    localStorage.setItem('theme', theme);
-    this.updateParallaxForTheme(theme);
-  }
-
-  updateParallaxForTheme(theme) {
-    const layers = document.querySelectorAll('.parallax-layer');
-    layers.forEach(layer => {
-      if (theme === 'light') {
-        layer.style.opacity = '0.03';
-      } else {
-        layer.style.opacity = layer.classList.contains('parallax-layer-1') ? '0.1' : '0.05';
-      }
-    });
-  }
-
-  setupThemeTransitions() {
-    // Add smooth transitions for theme changes
-    const style = document.createElement('style');
-    style.textContent = `
-      * {
-        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  toggleTheme() {
-    const isLightMode = document.body.classList.contains('light-mode');
-    this.setTheme(isLightMode ? 'dark' : 'light');
-
-    // Add ripple effect to toggle button
-    this.createRippleEffect();
-  }
-
-  createRippleEffect() {
-    const ripple = document.createElement('div');
-    ripple.style.cssText = `
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(59, 130, 246, 0.3);
-      transform: scale(0);
-      animation: ripple 0.6s linear;
-      pointer-events: none;
-    `;
-
-    const rect = this.themeToggle.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    ripple.style.width = ripple.style.height = size + 'px';
-    ripple.style.left = rect.left + rect.width / 2 - size / 2 + 'px';
-    ripple.style.top = rect.top + rect.height / 2 - size / 2 + 'px';
-
-    document.body.appendChild(ripple);
-
-    setTimeout(() => {
-      document.body.removeChild(ripple);
-    }, 600);
-  }
-
-  bindEvents() {
-    this.themeToggle?.addEventListener('click', () => this.toggleTheme());
-  }
-}
-
-// Enhanced Navigation Manager
-class NavigationManager {
-  constructor() {
-    this.navbar = document.querySelector('.navbar');
-    this.navLinks = document.querySelectorAll('.nav-link');
-    this.scrollIndicator = document.querySelector('.scroll-indicator');
-    this.lastScrollY = 0;
-    this.init();
-  }
-
-  init() {
-    this.bindEvents();
-    this.handleScroll();
-    this.setupSmoothScrolling();
-  }
-
-  setupSmoothScrolling() {
-    // Enhanced smooth scrolling with easing
-    this.navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-
-        if (targetElement) {
-          this.smoothScrollTo(targetElement);
-        }
-      });
-    });
-
-    // Scroll indicator click
-    this.scrollIndicator?.addEventListener('click', () => {
-      const aboutSection = document.getElementById('about');
-      if (aboutSection) {
-        this.smoothScrollTo(aboutSection);
-      }
-    });
-  }
-
-  smoothScrollTo(element) {
-    const targetPosition = element.offsetTop - 80;
-    const startPosition = window.pageYOffset;
-    const distance = targetPosition - startPosition;
-    const duration = 1000;
-    let start = null;
-
-    const animation = (currentTime) => {
-      if (start === null) start = currentTime;
-      const timeElapsed = currentTime - start;
-      const run = this.easeInOutQuart(timeElapsed, startPosition, distance, duration);
-      window.scrollTo(0, run);
-      if (timeElapsed < duration) requestAnimationFrame(animation);
-    };
-
-    requestAnimationFrame(animation);
-  }
-
-  easeInOutQuart(t, b, c, d) {
-    t /= d / 2;
-    if (t < 1) return c / 2 * t * t * t * t + b;
-    t -= 2;
-    return -c / 2 * (t * t * t * t - 2) + b;
-  }
-
-  bindEvents() {
-    window.addEventListener('scroll', Utils.throttle(() => {
-      this.handleScroll();
-    }, 16)); // 60fps
-  }
-
-  handleScroll() {
-    const scrollY = window.scrollY;
-
-    // Navbar effects
-    if (this.navbar) {
-      if (scrollY > 100) {
-        this.navbar.classList.add('scrolled');
-      } else {
-        this.navbar.classList.remove('scrolled');
-      }
-
-      // Hide/show navbar on scroll
-      if (scrollY > this.lastScrollY && scrollY > 200) {
-        this.navbar.style.transform = 'translateY(-100%)';
-      } else {
-        this.navbar.style.transform = 'translateY(0)';
-      }
+    if (data.profile_picture) {
+      const imgPath = `/uploads/profile/${data.profile_picture}`;
+      const heroPic = document.getElementById('hero-profile-picture');
+      if (heroPic) heroPic.src = imgPath;
     }
+  },
 
-    // Scroll indicator
-    if (this.scrollIndicator) {
-      if (scrollY > 300) {
-        this.scrollIndicator.style.opacity = '0';
-        this.scrollIndicator.style.pointerEvents = 'none';
-      } else {
-        this.scrollIndicator.style.opacity = '1';
-        this.scrollIndicator.style.pointerEvents = 'auto';
-      }
+  renderAbout: (data) => {
+    if (!data) return;
+    if (data.summary) {
+      const aboutSummary = document.getElementById('about-summary');
+      if (aboutSummary) aboutSummary.innerHTML = `<p>${data.summary}</p>`;
     }
-
-    this.updateActiveNavigation();
-    this.lastScrollY = scrollY;
-  }
-
-  updateActiveNavigation() {
-    const sections = document.querySelectorAll('section[id]');
-    const scrollPos = window.scrollY + 150;
-
-    sections.forEach(section => {
-      const sectionTop = section.offsetTop;
-      const sectionHeight = section.offsetHeight;
-      const sectionId = section.getAttribute('id');
-      const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-
-      if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-        this.navLinks.forEach(link => link.classList.remove('active'));
-        navLink?.classList.add('active');
-      }
-    });
-  }
-}
-
-// Enhanced Animation Manager
-class AnimationManager {
-  constructor() {
-    this.observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-    this.init();
-  }
-
-  init() {
-    this.setupIntersectionObserver();
-    this.setupSkillBarAnimations();
-    this.setupCounterAnimations();
-    this.setupTypewriterEffect();
-  }
-
-  setupIntersectionObserver() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            entry.target.classList.add('visible');
-            this.triggerElementAnimation(entry.target);
-          }, index * 100);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, this.observerOptions);
-
-    // Observe elements for animations
-    const animatedElements = document.querySelectorAll(`
-      .section, .timeline-item, .skill-category, 
-      .portfolio-item, .contact-item, .stat-item
-    `);
-
-    animatedElements.forEach(element => {
-      element.classList.add('fade-in');
-      observer.observe(element);
-    });
-  }
-
-  triggerElementAnimation(element) {
-    // Add specific animations based on element type
-    if (element.classList.contains('timeline-item')) {
-      element.style.animation = 'slideInFromRight 0.6s ease forwards';
-    } else if (element.classList.contains('skill-category')) {
-      element.style.animation = 'scaleIn 0.5s ease forwards';
-    } else if (element.classList.contains('portfolio-item')) {
-      element.style.animation = 'flipIn 0.7s ease forwards';
+    if (data.experience_years) {
+      const statExp = document.getElementById('stat-experience');
+      if (statExp) statExp.textContent = data.experience_years;
+      const heroExp = document.getElementById('hero-experience-years');
+      if (heroExp) heroExp.textContent = data.experience_years;
     }
-  }
-
-  setupSkillBarAnimations() {
-    const skillBars = document.querySelectorAll('.skill-progress');
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const progressBar = entry.target;
-          const width = progressBar.style.width;
-          progressBar.style.width = '0%';
-
-          setTimeout(() => {
-            progressBar.style.width = width;
-            progressBar.style.animation = 'progressFill 1.5s ease forwards';
-          }, 300);
-
-          observer.unobserve(progressBar);
-        }
-      });
-    }, this.observerOptions);
-
-    skillBars.forEach(bar => observer.observe(bar));
-  }
-
-  setupCounterAnimations() {
-    const counters = document.querySelectorAll('.stat-number');
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          this.animateCounter(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, this.observerOptions);
-
-    counters.forEach(counter => observer.observe(counter));
-  }
-
-  animateCounter(element) {
-    const target = parseFloat(element.textContent);
-    const duration = 2000;
-    const step = target / (duration / 16);
-    let current = 0;
-
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) {
-        current = target;
-        clearInterval(timer);
-      }
-
-      if (element.textContent.includes('+')) {
-        element.textContent = Math.floor(current) + '+';
-      } else {
-        element.textContent = Math.floor(current);
-      }
-    }, 16);
-  }
-
-  setupTypewriterEffect() {
-    const typewriterElements = document.querySelectorAll('.typewriter');
-
-    typewriterElements.forEach(element => {
-      const text = element.textContent;
-      element.textContent = '';
-      element.style.borderRight = '2px solid var(--primary-color)';
-
-      let i = 0;
-      const timer = setInterval(() => {
-        element.textContent += text.charAt(i);
-        i++;
-        if (i >= text.length) {
-          clearInterval(timer);
-          setTimeout(() => {
-            element.style.borderRight = 'none';
-          }, 1000);
-        }
-      }, 100);
-    });
-  }
-}
-
-// Enhanced Portfolio Manager
-class PortfolioManager {
-  constructor() {
-    this.modal = document.getElementById('portfolio-modal');
-    this.modalBody = document.getElementById('modal-body');
-    this.closeBtn = document.querySelector('.modal-close');
-    this.init();
-  }
-
-  init() {
-    this.bindEvents();
-    this.setupPortfolioData();
-    this.setupPortfolioHoverEffects();
-  }
-
-  setupPortfolioHoverEffects() {
-    const portfolioItems = document.querySelectorAll('.portfolio-item');
-
-    portfolioItems.forEach(item => {
-      item.addEventListener('mouseenter', (e) => {
-        this.createHoverEffect(e.target);
-      });
-
-      item.addEventListener('mousemove', (e) => {
-        this.updateHoverEffect(e);
-      });
-
-      item.addEventListener('mouseleave', (e) => {
-        this.removeHoverEffect(e.target);
-      });
-    });
-  }
-
-  createHoverEffect(item) {
-    const rect = item.getBoundingClientRect();
-    const overlay = item.querySelector('.portfolio-overlay');
-
-    if (overlay) {
-      overlay.style.background = `
-        radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-        rgba(59, 130, 246, 0.9) 0%, 
-        rgba(245, 158, 11, 0.9) 100%)
-      `;
+    if (data.projects_completed) {
+      const statProj = document.getElementById('stat-projects');
+      if (statProj) statProj.textContent = data.projects_completed;
     }
-  }
-
-  updateHoverEffect(e) {
-    const item = e.currentTarget;
-    const rect = item.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-    item.style.setProperty('--mouse-x', x + '%');
-    item.style.setProperty('--mouse-y', y + '%');
-  }
-
-  removeHoverEffect(item) {
-    const overlay = item.querySelector('.portfolio-overlay');
-    if (overlay) {
-      overlay.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(245, 158, 11, 0.9))';
+    if (data.companies_count) {
+      const statComp = document.getElementById('stat-companies');
+      if (statComp) statComp.textContent = data.companies_count;
     }
-  }
+  },
 
-  bindEvents() {
-    this.closeBtn?.addEventListener('click', () => this.closeModal());
-    this.modal?.addEventListener('click', (e) => {
-      if (e.target === this.modal) this.closeModal();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.modal?.style.display === 'block') {
-        this.closeModal();
-      }
-    });
-  }
-
-  setupPortfolioData() {
-    this.portfolioData = {
-      'pcb-design': {
-        title: 'Multilayer PCB Design',
-        description: 'Advanced multilayer PCB design for aerospace applications with strict DFM compliance and high-density routing.',
-        technologies: ['Altium Designer', 'DFM', 'DFA', 'DFT', 'Signal Integrity'],
-        features: [
-          'High-density multilayer routing',
-          'Impedance controlled traces',
-          'Via-in-pad technology',
-          'Thermal management',
-          'EMI/EMC compliance'
-        ],
-        images: [
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=PCB+Layout+Top',
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=PCB+Layout+Bottom',
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=3D+Render'
-        ]
-      },
-      'antenna-design': {
-        title: 'RF Antenna System',
-        description: 'High-performance antenna design with comprehensive HFSS simulation and Environmental Stress Screening validation.',
-        technologies: ['Ansys HFSS', 'RF Design', 'ESS Testing', 'Antenna Theory'],
-        features: [
-          'Multi-band operation',
-          'High gain characteristics',
-          'Low VSWR across frequency range',
-          'Environmental stress tested',
-          'Compact form factor'
-        ],
-        images: [
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Antenna+Design',
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=HFSS+Simulation',
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Test+Results'
-        ]
-      },
-      'circuit-analysis': {
-        title: 'Circuit Analysis & Simulation',
-        description: 'Comprehensive circuit analysis using LTSpice for embedded systems with focus on power management and signal conditioning.',
-        technologies: ['LTSpice', 'Circuit Analysis', 'Power Management', 'Signal Conditioning'],
-        features: [
-          'AC/DC analysis',
-          'Transient response simulation',
-          'Frequency domain analysis',
-          'Monte Carlo analysis',
-          'Worst-case design verification'
-        ],
-        images: [
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Circuit+Schematic',
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Simulation+Results',
-          'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Analysis+Plots'
-        ]
-      }
-    };
-  }
-
-  openModal(projectId) {
-    const project = this.portfolioData[projectId];
-    if (!project) return;
-
-    this.modalBody.innerHTML = this.generateModalContent(project);
-    this.modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-
-    // Add entrance animation
-    this.modal.style.animation = 'modalFadeIn 0.3s ease';
-    this.modal.querySelector('.modal-content').style.animation = 'modalSlideIn 0.3s ease';
-  }
-
-  closeModal() {
-    this.modal.style.animation = 'modalFadeOut 0.3s ease';
-    setTimeout(() => {
-      this.modal.style.display = 'none';
-      document.body.style.overflow = 'auto';
-    }, 300);
-  }
-
-  generateModalContent(project) {
-    return `
-      <div class="modal-project">
-        <h2 class="modal-title">${project.title}</h2>
-        <p class="modal-description">${project.description}</p>
-        
-        <div class="modal-images">
-          ${project.images.map(img => `
-            <img src="${img}" alt="${project.title}" class="modal-image">
-          `).join('')}
-        </div>
-        
-        <div class="modal-section">
-          <h3>Technologies Used</h3>
-          <div class="modal-tags">
-            ${project.technologies.map(tech => `
-              <span class="modal-tag">${tech}</span>
-            `).join('')}
+  renderExperience: (data) => {
+    const container = document.getElementById('experience-list');
+    if (!data || !container) return;
+    container.innerHTML = data.map((item, index) => `
+      <div class="timeline-item ${index % 2 === 0 ? 'left' : 'right'}">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content">
+          <div class="timeline-header">
+            <h3 class="job-title">${item.title}</h3>
+            <span class="job-period">${item.period}</span>
           </div>
-        </div>
-        
-        <div class="modal-section">
-          <h3>Key Features</h3>
-          <ul class="modal-features">
-            ${project.features.map(feature => `
-              <li>${feature}</li>
-            `).join('')}
+          <div class="company">
+            ${item.company}
+            ${item.location ? `<span class="location-tag"><i class="fas fa-map-marker-alt"></i> ${item.location}</span>` : ''}
+          </div>
+          <ul class="job-responsibilities">
+            ${item.responsibilities.map(r => `<li>${r}</li>`).join('')}
           </ul>
         </div>
       </div>
-    `;
-  }
-}
+    `).join('');
+  },
 
-// Enhanced Contact Manager
-class ContactManager {
-  constructor() {
-    this.form = document.getElementById('contact-form');
-    this.init();
-  }
-
-  init() {
-    this.bindEvents();
-    this.setupFormValidation();
-  }
-
-  setupFormValidation() {
-    const inputs = this.form?.querySelectorAll('input, textarea');
-
-    inputs?.forEach(input => {
-      input.addEventListener('blur', () => this.validateField(input));
-      input.addEventListener('input', () => this.clearFieldError(input));
-    });
-  }
-
-  validateField(field) {
-    const value = field.value.trim();
-    let isValid = true;
-    let errorMessage = '';
-
-    switch (field.type) {
-      case 'email':
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-          isValid = false;
-          errorMessage = 'Please enter a valid email address';
-        }
-        break;
-      case 'text':
-        if (value.length < 2) {
-          isValid = false;
-          errorMessage = 'This field must be at least 2 characters long';
-        }
-        break;
-      default:
-        if (value.length < 10) {
-          isValid = false;
-          errorMessage = 'This field must be at least 10 characters long';
-        }
-    }
-
-    this.showFieldValidation(field, isValid, errorMessage);
-    return isValid;
-  }
-
-  showFieldValidation(field, isValid, errorMessage) {
-    const existingError = field.parentNode.querySelector('.field-error');
-    if (existingError) {
-      existingError.remove();
-    }
-
-    if (!isValid) {
-      field.style.borderColor = '#ef4444';
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'field-error';
-      errorDiv.textContent = errorMessage;
-      errorDiv.style.cssText = `
-        color: #ef4444;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-        animation: fadeInUp 0.3s ease;
-      `;
-      field.parentNode.appendChild(errorDiv);
-    } else {
-      field.style.borderColor = '#10b981';
-    }
-  }
-
-  clearFieldError(field) {
-    const existingError = field.parentNode.querySelector('.field-error');
-    if (existingError) {
-      existingError.remove();
-    }
-  }
-
-  bindEvents() {
-    this.form?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // Validate all fields
-      const inputs = this.form.querySelectorAll('input, textarea');
-      let isValid = true;
-      inputs.forEach(input => {
-        if (!this.validateField(input)) isValid = false;
-      });
-
-      if (!isValid) return;
-
-      const submitBtn = this.form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-      try {
-        const formData = new FormData(this.form);
-        const data = Object.fromEntries(formData.entries());
-
-        const response = await fetch(`${API_BASE_URL}/api/contact`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          alert('Message sent successfully!');
-          this.form.reset();
-        } else {
-          alert('Failed to send message. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again later.');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-      }
-    });
-  }
-}
-
-// Utility Functions
-class Utils {
-  static debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-
-  static throttle(func, limit) {
-    let inThrottle;
-    return function () {
-      const args = arguments;
-      const context = this;
-      if (!inThrottle) {
-        func.apply(context, args);
-        inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
-      }
-    };
-  }
-
-  static lerp(start, end, factor) {
-    return start + (end - start) * factor;
-  }
-
-  static clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-  }
-}
-
-// Global Functions
-function openPortfolioModal(projectId) {
-  window.portfolioManager?.openModal(projectId);
-}
-
-// Data Fetching and Rendering
-async function loadPortfolioData() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/data`);
-    const data = await response.json();
-
-    if (data) {
-      renderAbout(data.about);
-      renderExperience(data.experience);
-      renderSkills(data.skills);
-      renderProjects(data.projects);
-    }
-  } catch (error) {
-    console.error('Error loading data:', error);
-  }
-}
-
-function renderAbout(about) {
-  if (!about) return;
-
-  const summaryEl = document.getElementById('about-summary');
-  if (summaryEl) summaryEl.innerHTML = about.summary || '';
-
-  const expYearsEl = document.getElementById('stat-experience');
-  if (expYearsEl) expYearsEl.textContent = about.experience_years || '1.9+';
-
-  const heroExpEl = document.getElementById('hero-experience-years');
-  if (heroExpEl) heroExpEl.textContent = about.experience_years || '1.9+';
-
-  const projectsEl = document.getElementById('stat-projects');
-  if (projectsEl) projectsEl.textContent = about.projects_completed || '50+';
-
-  const companiesEl = document.getElementById('stat-companies');
-  if (companiesEl) companiesEl.textContent = about.companies_count || '2';
-}
-
-function renderExperience(experience) {
-  const container = document.getElementById('experience-list');
-  if (!container || !experience) return;
-
-  container.innerHTML = experience.map(exp => `
-    <div class="timeline-item">
-      <div class="timeline-marker"></div>
-      <div class="timeline-content">
-        <div class="timeline-header">
-          <h3 class="job-title">${exp.title}</h3>
-          <span class="job-period">${exp.period}</span>
-        </div>
-        <div class="company">${exp.company}</div>
-        <ul class="job-responsibilities">
-          ${exp.responsibilities.map(resp => `<li>${resp}</li>`).join('')}
-        </ul>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderSkills(skills) {
-  const container = document.getElementById('skills-grid');
-  if (!container || !skills) return;
-
-  const categories = [...new Set(skills.map(s => s.category))];
-
-  container.innerHTML = categories.map(cat => `
-    <div class="skill-category">
-      <h3 class="category-title">
-        <i class="fas fa-code"></i>
-        ${cat}
-      </h3>
-      <div class="skills-list">
-        ${skills.filter(s => s.category === cat).map(skill => `
-          <div class="skill-item">
-            <span class="skill-name">${skill.name}</span>
-            <div class="skill-bar">
-              <div class="skill-progress" style="width: ${skill.level}%"></div>
+  renderSkills: (data) => {
+    const container = document.getElementById('skills-grid');
+    if (!data || !container) return;
+    const grouped = data.reduce((acc, skill) => {
+      (acc[skill.category] = acc[skill.category] || []).push(skill);
+      return acc;
+    }, {});
+    container.innerHTML = Object.entries(grouped).map(([cat, skills]) => `
+      <div class="skill-category">
+        <h3 class="skill-category-title">${cat}</h3>
+        <div class="skill-list">
+          ${skills.map(s => `
+            <div class="skill-item">
+              <div class="skill-info">
+                <span class="skill-name">${s.name}</span>
+                <span class="skill-percentage">${s.level}%</span>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-progress" style="width: ${s.level}%"></div>
+              </div>
             </div>
-          </div>
-        `).join('')}
+          `).join('')}
+        </div>
       </div>
-    </div>
-  `).join('');
-}
+    `).join('');
+  },
 
-function renderProjects(projects) {
-  const container = document.getElementById('portfolio-grid');
-  if (!container || !projects) return;
-
-  container.innerHTML = projects.map(project => `
-    <div class="portfolio-item">
-      <div class="portfolio-image">
-        <img src="${project.image_url || 'https://via.placeholder.com/400x300'}" alt="${project.title}">
-        <div class="portfolio-overlay">
-          <div class="portfolio-actions">
-            <button class="portfolio-btn" onclick="openPortfolioModal('${project.id}')">
-              <i class="fas fa-eye"></i>
-            </button>
-            <a href="#" class="portfolio-btn" target="_blank">
-              <i class="fas fa-external-link-alt"></i>
-            </a>
+  renderProjects: (data) => {
+    const container = document.getElementById('portfolio-grid');
+    if (!data || !container) return;
+    window.portfolioData = data.reduce((acc, proj) => { acc[proj.id] = proj; return acc; }, {});
+    container.innerHTML = data.map(project => `
+      <div class="portfolio-item" onclick="portfolioManager.openModal(${project.id})">
+        <div class="portfolio-image">
+          <img src="${project.image_url ? `/uploads/profile/${project.image_url}` : 'https://via.placeholder.com/600x400'}" alt="${project.title}">
+          <div class="portfolio-overlay"><i class="fas fa-plus"></i></div>
+        </div>
+        <div class="portfolio-info">
+          <h3>${project.title}</h3>
+          <div class="portfolio-tags">
+            ${project.tags.slice(0, 3).map(tag => `<span>${tag}</span>`).join('')}
           </div>
         </div>
       </div>
-      <div class="portfolio-content">
-        <h3 class="portfolio-title">${project.title}</h3>
-        <p class="portfolio-description">${project.description}</p>
-        <div class="portfolio-tags">
-          ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+    `).join('');
+  },
+
+  renderCertifications: (data) => {
+    const container = document.getElementById('certifications-grid');
+    if (!data || !container) return;
+    container.innerHTML = data.map(cert => `
+      <div class="certification-card">
+        <div class="cert-header">
+          <div>
+            <div class="cert-title">${cert.name}</div>
+            <div class="cert-issuer">${cert.issuer}</div>
+          </div>
+          ${cert.type === 'Badge' ? '<i class="fas fa-certificate" style="color: var(--accent-color);"></i>' : ''}
         </div>
+        <div class="cert-date">${cert.date}</div>
+        ${cert.embed_code ? `<div class="cert-badge">${cert.embed_code}</div>` : ''}
+        ${cert.link ? `<a href="${cert.link}" target="_blank" class="text-sm text-primary hover:underline">View Certificate <i class="fas fa-external-link-alt"></i></a>` : ''}
       </div>
-    </div>
-  `).join('');
-}
+    `).join('');
+  },
 
-// Load Personal Details and Profile Picture
-async function loadPersonalDetailsData() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/public/personal-details`);
-    const data = await response.json();
+  renderPublications: (data) => {
+    const container = document.getElementById('publications-list');
+    if (!data || !container) return;
+    container.innerHTML = data.map(pub => `
+      <div class="publication-item">
+        <div class="pub-title">${pub.title}</div>
+        <div class="pub-publisher">${pub.publisher}</div>
+        <div class="pub-date"><i class="far fa-calendar-alt"></i> ${pub.date}</div>
+        ${pub.link ? `<a href="${pub.link}" target="_blank" class="pub-link">Read Paper <i class="fas fa-arrow-right"></i></a>` : ''}
+      </div>
+    `).join('');
+  },
 
-    if (data && Object.keys(data).length > 0) {
-      // Update hero section name
-      if (data.name) {
-        const heroName = document.getElementById('hero-name');
-        if (heroName) heroName.textContent = data.name;
-
-        // Update navigation logo
-        const navLogoName = document.getElementById('nav-logo-name');
-        if (navLogoName) navLogoName.textContent = data.name;
-
-        // Update footer name
-        const footerName = document.getElementById('footer-name');
-        if (footerName) footerName.textContent = data.name;
-
-        // Update page title
-        document.title = `${data.name} - Professional Portfolio`;
-      }
-
-      // Update footer year to current year
-      const footerYear = document.getElementById('footer-year');
-      if (footerYear) footerYear.textContent = new Date().getFullYear();
-
-      // Update hero bio
-      if (data.bio) {
-        const heroBio = document.getElementById('hero-bio');
-        if (heroBio) heroBio.textContent = data.bio;
-      }
-
-      // Update profile picture
-      if (data.profile_picture) {
-        const profileImages = document.querySelectorAll('.profile-photo, #hero-profile-picture');
-        profileImages.forEach(img => {
-          img.src = `/uploads/profile/${data.profile_picture}`;
-          img.alt = data.name || 'Profile Picture';
-        });
-      }
-
-      // Update contact information
-      if (data.email) {
-        const emailElements = document.querySelectorAll('.contact-item .contact-details p');
-        emailElements.forEach(el => {
-          if (el.textContent.includes('@')) el.textContent = data.email;
-        });
-      }
-
-      if (data.phone) {
-        const phoneElements = document.querySelectorAll('.contact-item .contact-details p');
-        phoneElements.forEach(el => {
-          const parent = el.closest('.contact-details');
-          if (parent && parent.previousElementSibling) {
-            const icon = parent.previousElementSibling.querySelector('i');
-            if (icon && icon.classList.contains('fa-phone')) {
-              el.textContent = data.phone;
-            }
-          }
-        });
-      }
-
-      if (data.location) {
-        const locationElements = document.querySelectorAll('.contact-item .contact-details p');
-        locationElements.forEach(el => {
-          const parent = el.closest('.contact-details');
-          if (parent && parent.previousElementSibling) {
-            const icon = parent.previousElementSibling.querySelector('i');
-            if (icon && icon.classList.contains('fa-map-marker-alt')) {
-              el.textContent = data.location;
-            }
-          }
-        });
-      }
-
-      // Update social media links - DISABLED (keeping static placeholder links)
-      // updateSocialMediaLinks(data);
-    }
-  } catch (error) {
-    console.error('Error loading personal details:', error);
-  }
-}
-
-// Update Social Media Links
-function updateSocialMediaLinks(data) {
-  // GitHub
-  if (data.github_url) {
-    const githubLink = document.querySelector('#nav-github');
-    if (githubLink) githubLink.href = data.github_url;
-  }
-
-  // LinkedIn
-  if (data.linkedin_url) {
-    const linkedinLink = document.querySelector('#nav-linkedin');
-    if (linkedinLink) linkedinLink.href = data.linkedin_url;
-  }
-
-  // ORCID
-  if (data.orcid_url) {
-    const orcidLink = document.querySelector('#nav-orcid');
-    if (orcidLink) orcidLink.href = data.orcid_url;
-  }
-
-  // Google Scholar (show if URL provided)
-  if (data.google_scholar_url) {
-    const scholarLink = document.querySelector('#nav-scholar');
-    if (scholarLink) {
-      scholarLink.href = data.google_scholar_url;
-      scholarLink.style.display = '';
-    }
-  }
-
-  // GitLab (add dynamically if provided)
-  if (data.gitlab_url) {
-    const socialIcons = document.querySelector('.nav-actions .social-icons');
-    let gitlabLink = document.querySelector('#nav-gitlab');
-
-    if (!gitlabLink && socialIcons) {
-      gitlabLink = document.createElement('a');
-      gitlabLink.href = data.gitlab_url;
-      gitlabLink.target = '_blank';
-      gitlabLink.setAttribute('aria-label', 'GitLab');
-      gitlabLink.className = 'social-link';
-      gitlabLink.id = 'nav-gitlab';
-      gitlabLink.innerHTML = '<i class="fab fa-gitlab"></i>';
-      socialIcons.appendChild(gitlabLink);
-    } else if (gitlabLink) {
-      gitlabLink.href = data.gitlab_url;
-    }
-  }
-}
-
-// Initialize Application
-document.addEventListener('DOMContentLoaded', () => {
-  // Load dynamic data
-  loadPortfolioData();
-  loadPersonalDetailsData();
-
-  // Initialize all managers
-  window.parallaxManager = new ParallaxManager();
-  window.scrollEffectsManager = new ScrollEffectsManager();
-  window.themeManager = new ThemeManager();
-  window.navigationManager = new NavigationManager();
-  window.animationManager = new AnimationManager();
-  window.portfolioManager = new PortfolioManager();
-  window.contactManager = new ContactManager();
-
-  // Add loading complete class
-  document.body.classList.add('loaded');
-
-  // Performance optimization: Lazy load images
-  if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          if (img.dataset.src) {
-            img.src = img.dataset.src;
-            img.classList.remove('lazy');
-          }
-          observer.unobserve(img);
+  // Render admin panel data: dynamic social links only
+  renderAdminPanel: (data) => {
+    if (!data) return;
+    const socialMap = {
+      'social-link-linkedin': 'linkedin',
+      'social-link-github': 'github',
+      'social-link-gitlab': 'gitlab',
+      'social-link-orcid': 'orcid',
+      'social-link-scholar': 'scholar'
+    };
+    Object.entries(socialMap).forEach(([elemId, key]) => {
+      const el = document.getElementById(elemId);
+      if (el) {
+        const url = data.socialLinks && data.socialLinks[key];
+        if (url) {
+          el.setAttribute('href', url);
+        } else {
+          el.style.display = 'none';
         }
-      });
+      }
     });
+  },
 
-    document.querySelectorAll('img[data-src]').forEach(img => {
-      imageObserver.observe(img);
-    });
+  // Render hero badge from certifications data
+  renderHeroBadge: (certifications) => {
+    if (!certifications || !Array.isArray(certifications)) return;
+    const badgeCert = certifications.find(cert => cert.type === 'Badge');
+    const badgeEl = document.getElementById('hero-badge');
+    if (badgeEl && badgeCert && badgeCert.embed_code) {
+      badgeEl.innerHTML = badgeCert.embed_code;
+    }
   }
+};
 
-  // Add custom CSS animations
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideInFromRight {
-      from { opacity: 0; transform: translateX(50px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    
-    @keyframes flipIn {
-      from { opacity: 0; transform: rotateY(-90deg); }
-      to { opacity: 1; transform: rotateY(0); }
-    }
-    
-    @keyframes bounceIn {
-      0% { opacity: 0; transform: scale(0.3); }
-      50% { transform: scale(1.05); }
-      70% { transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-    
-    @keyframes progressFill {
-      from { width: 0%; }
-      to { width: var(--progress-width, 100%); }
-    }
-    
-    @keyframes ripple {
-      to { transform: scale(4); opacity: 0; }
-    }
-    
-    @keyframes modalFadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    
-    .notification-content {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .notification-close {
-      background: none;
-      border: none;
-      color: inherit;
-      font-size: 1.2rem;
-      cursor: pointer;
-      margin-left: auto;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .field-error {
-      animation: fadeInUp 0.3s ease;
-    }
-  `;
-  document.head.appendChild(style);
-});
+// --- Initialize Application ---
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const [personal, about, experience, skills, projects, certifications, publications, adminPanel] = await Promise.all([
+      DataManager.getPersonalDetails().catch(e => { console.error('Personal fetch error', e); return null; }),
+      DataManager.getAbout().catch(e => { console.error('About fetch error', e); return null; }),
+      DataManager.getExperience().catch(e => { console.error('Experience fetch error', e); return []; }),
+      DataManager.getSkills().catch(e => { console.error('Skills fetch error', e); return []; }),
+      DataManager.getProjects().catch(e => { console.error('Projects fetch error', e); return []; }),
+      DataManager.getCertifications().catch(e => { console.error('Certifications fetch error', e); return []; }),
+      DataManager.getPublications().catch(e => { console.error('Publications fetch error', e); return []; }),
+      DataManager.getAdminPanel().catch(e => { console.error('Admin panel fetch error', e); return {}; })
+    ]);
 
-// Handle page visibility changes
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    document.title = 'Come back! - Balaji B';
-  } else {
-    document.title = 'Balaji B - Associate Engineer | Hardware & Antenna Design Specialist';
+    if (personal) Renderer.renderPersonalDetails(personal);
+    if (about) Renderer.renderAbout(about);
+    if (experience) Renderer.renderExperience(experience);
+    if (skills) Renderer.renderSkills(skills);
+    if (projects) Renderer.renderProjects(projects);
+    if (certifications) {
+      Renderer.renderCertifications(certifications);
+      Renderer.renderHeroBadge(certifications); // Extract and render badge in hero section
+    }
+    if (publications) Renderer.renderPublications(publications);
+    Renderer.renderAdminPanel(adminPanel);
+  } catch (error) {
+    console.error('Initialization error:', error);
+  } finally {
+    // Initialize UI managers (always run)
+    window.portfolioManager = new PortfolioManager();
+    new ParallaxManager();
+    new ScrollEffectsManager();
+    new ThemeManager();
+    new NavigationManager();
+    new AnimationManager();
+    new ContactManager();
   }
 });
-
-// Handle reduced motion preference
-if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  document.documentElement.style.setProperty('--transition-fast', '0.01ms');
-  document.documentElement.style.setProperty('--transition-normal', '0.01ms');
-  document.documentElement.style.setProperty('--transition-slow', '0.01ms');
-}
-

@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div class="admin-layout">        <!-- Sidebar -->
+    <div class="admin-layout"> <!-- Sidebar -->
         <aside class="sidebar" id="admin-sidebar">
             <!-- Dynamically loaded by sidebar.js -->
         </aside>
@@ -31,7 +31,8 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
                                 <label class="form-label">Job Title</label>
-                                <input type="text" name="title" class="form-control" required>
+                                <input type="text" name="title" class="form-control"
+                                    placeholder="e.g. Hardware Design Engineer" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Company</label>
@@ -56,9 +57,11 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Responsibilities (JSON array or text)</label>
-                            <textarea name="responsibilities" class="form-control"
-                                placeholder='["Task 1", "Task 2"]'></textarea>
+                            <label class="form-label">Responsibilities</label>
+                            <textarea name="responsibilities" class="form-control" placeholder='"Design and simulate analog and digital circuits",
+"Perform signal integrity and timing analysis for high-speed interfaces",
+"Test and debug hardware prototypes using lab instruments",
+"Document design specifications and validation reports"'></textarea>
                         </div>
                         <div style="text-align: right;">
                             <button type="submit" class="btn btn-primary">
@@ -82,6 +85,7 @@
     </div>
 
     <script src="/admin/js/admin.js"></script>
+    <script src="/admin/js/sidebar.js"></script>
     <script>
         checkAuth();
         loadExperienceData();

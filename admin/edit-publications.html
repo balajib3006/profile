@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div class="admin-layout">        <!-- Sidebar -->
+    <div class="admin-layout"> <!-- Sidebar -->
         <aside class="sidebar" id="admin-sidebar">
             <!-- Dynamically loaded by sidebar.js -->
         </aside>
@@ -34,7 +34,8 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Publisher</label>
-                            <input type="text" name="publisher" class="form-control" required>
+                            <input type="text" name="publisher" class="form-control"
+                                placeholder="e.g. IEEE Transactions, Springer" required>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
@@ -68,6 +69,7 @@
     </div>
 
     <script src="/admin/js/admin.js"></script>
+    <script src="/admin/js/sidebar.js"></script>
     <script>
         checkAuth();
         loadPublicationsData();

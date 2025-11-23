@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div class="admin-layout">        <!-- Sidebar -->
+    <div class="admin-layout"> <!-- Sidebar -->
         <aside class="sidebar" id="admin-sidebar">
             <!-- Dynamically loaded by sidebar.js -->
         </aside>
@@ -32,9 +32,13 @@
                             <div class="form-group">
                                 <label class="form-label">Category</label>
                                 <select name="category" class="form-control">
-                                    <option value="Frontend">Frontend</option>
-                                    <option value="Backend">Backend</option>
-                                    <option value="Tools">Tools</option>
+                                    <option value="Embedded Systems">Embedded Systems</option>
+                                    <option value="VLSI / FPGA">VLSI / FPGA</option>
+                                    <option value="Circuit Design">Circuit Design</option>
+                                    <option value="Signal Processing">Signal Processing</option>
+                                    <option value="Telecommunications">Telecommunications</option>
+                                    <option value="Programming">Programming (C/C++, Verilog)</option>
+                                    <option value="Tools">Tools (MATLAB, KiCad)</option>
                                     <option value="Other">Other</option>
                                 </select>
                             </div>
@@ -69,6 +73,7 @@
     </div>
 
     <script src="/admin/js/admin.js"></script>
+    <script src="/admin/js/sidebar.js"></script>
     <script>
         checkAuth();
         loadSkillsData();

@@ -60,7 +60,8 @@ function initDatabase() {
             title TEXT,
             company TEXT,
             period TEXT,
-            responsibilities TEXT
+            responsibilities TEXT,
+            location TEXT
         )`);
 
         // Skills Table
@@ -79,7 +80,8 @@ function initDatabase() {
             tags TEXT,
             image_url TEXT,
             technologies TEXT,
-            features TEXT
+            features TEXT,
+            cad_file TEXT
         )`);
 
         // Messages Table
@@ -110,6 +112,15 @@ function initDatabase() {
             publisher TEXT,
             date TEXT,
             link TEXT
+        )`);
+
+        // Notification Settings Table
+        db.run(`CREATE TABLE IF NOT EXISTS notification_settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email_notifications INTEGER DEFAULT 0,
+            whatsapp_notifications INTEGER DEFAULT 0,
+            notification_email TEXT,
+            whatsapp_number TEXT
         )`);
     });
 }

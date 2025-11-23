@@ -87,31 +87,8 @@
 
 <body>
     <div class="admin-layout">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-bolt" style="color: var(--primary-color); font-size: 1.5rem;"></i>
-                <h2>Admin</h2>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="/admin/dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="/admin/edit-personal.html" class="active"><i class="fas fa-id-card"></i>
-                        Personal & About</a></li>
-                <li class="nav-item"><a href="/admin/edit-experience.html"><i class="fas fa-briefcase"></i>
-                        Experience</a></li>
-                <li class="nav-item"><a href="/admin/edit-skills.html"><i class="fas fa-code"></i> Skills</a></li>
-                <li class="nav-item"><a href="/admin/edit-projects.html"><i class="fas fa-project-diagram"></i>
-                        Projects</a></li>
-                <li class="nav-item"><a href="/admin/edit-certifications.html"><i class="fas fa-certificate"></i>
-                        Certifications</a></li>
-                <li class="nav-item"><a href="/admin/edit-publications.html"><i class="fas fa-book"></i>
-                        Publications</a></li>
-                <li class="nav-item"><a href="/admin/messages.html"><i class="fas fa-envelope"></i> Messages</a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <button id="logout-btn" class="btn btn-danger btn-sm" style="width: 100%; justify-content: center;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
+        <aside class="sidebar" id="admin-sidebar">
+            <!-- Dynamically loaded by sidebar.js -->
         </aside>
 
         <main class="main-content">
@@ -309,6 +286,7 @@
     </div>
 
     <script src="/admin/js/admin.js"></script>
+    <script src="/admin/js/sidebar.js"></script>
     <script>
         checkAuth();
         if (document.getElementById('edit-personal-form')) {
