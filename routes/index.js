@@ -54,19 +54,67 @@ router.get('/api/data', (req, res) => {
 });
 
 // Contact Form Submission API
-router.post('/api/contact', (req, res) => {
+router.post('/api/contact', async (req, res) => {
     const { name, email, subject, message } = req.body;
-    db.run("INSERT INTO messages (name, email, subject, message) VALUES (?, ?, ?, ?)",
-        [name, email, subject, message],
-        function (err) {
-            if (err) {
-                console.error(err);
-                res.status(500).json({ success: false, message: 'Database error' });
-            } else {
-                res.json({ success: true, message: 'Message sent successfully' });
+
+    try {
+        // Save message to database
+        await new Promise((resolve, reject) => {
+            db.run("INSERT INTO messages (name, email, subject, message) VALUES (?, ?, ?, ?)",
+                [name, email, subject, message],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve(this.lastID);
+                }
+            );
+        });
+
+        // Check notification settings
+        db.get("SELECT * FROM notification_settings LIMIT 1", async (err, settings) => {
+            if (!err && settings) {
+                const notificationService = require('../services/notificationService');
+                const messageData = { name, email, subject, message };
+
+                // Send email notification if enabled
+                if (settings.email_notifications && settings.notification_email) {
+                    const smtpConfig = {
+                        host: process.env.SMTP_HOST,
+                        port: parseInt(process.env.SMTP_PORT),
+                        user: process.env.SMTP_USER,
+                        pass: process.env.SMTP_PASS
+                    };
+
+                    try {
+                        await notificationService.sendEmailNotification(
+                            messageData,
+                            settings.notification_email,
+                            smtpConfig
+                        );
+                    } catch (error) {
+                        console.error('Failed to send email notification:', error);
+                    }
+                }
+
+                // Send WhatsApp notification if enabled
+                if (settings.whatsapp_notifications && settings.whatsapp_number) {
+                    try {
+                        await notificationService.sendWhatsAppNotification(
+                            messageData,
+                            settings.whatsapp_number
+                        );
+                    } catch (error) {
+                        console.error('Failed to send WhatsApp notification:', error);
+                    }
+                }
             }
-        }
-    );
+        });
+
+        res.json({ success: true, message: 'Message sent successfully' });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Database error' });
+    }
 });
 
 module.exports = router;

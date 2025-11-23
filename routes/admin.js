@@ -37,14 +37,14 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: function (req, file, cb) {
-        const filetypes = /jpeg|jpg|png|gif|webp/;
-        const mimetype = filetypes.test(file.mimetype);
+        const filetypes = /jpeg|jpg|png|gif|webp|step|stp|iges/;
+        const mimetype = filetypes.test(file.mimetype) || true; // Mime types for CAD files can be tricky, relying on extension mostly
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
-        if (mimetype && extname) {
+        if (extname) {
             return cb(null, true);
         }
-        cb(new Error('Only image files are allowed!'));
+        cb(new Error('Only image and CAD files (step, stp, iges) are allowed!'));
     }
 });
 
@@ -150,11 +150,11 @@ router.get('/experience', (req, res) => {
 });
 
 router.post('/experience/add', (req, res) => {
-    const { title, company, period, responsibilities } = req.body;
+    const { title, company, period, responsibilities, location } = req.body;
     const respArray = responsibilities.split('\n').filter(line => line.trim() !== '');
 
-    db.run(`INSERT INTO experience (title, company, period, responsibilities) VALUES (?, ?, ?, ?)`,
-        [title, company, period, JSON.stringify(respArray)],
+    db.run(`INSERT INTO experience (title, company, period, responsibilities, location) VALUES (?, ?, ?, ?, ?)`,
+        [title, company, period, JSON.stringify(respArray), location],
         function (err) {
             if (err) return res.status(500).json({ success: false, message: err.message });
             res.json({ success: true });
@@ -207,12 +207,15 @@ router.get('/projects', (req, res) => {
     });
 });
 
-router.post('/projects/add', (req, res) => {
-    const { title, description, image_url, tags } = req.body;
-    const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+router.post('/projects/add', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'cad_file', maxCount: 1 }]), (req, res) => {
+    const { title, description, tags } = req.body;
+    const tagsArray = tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '') : [];
 
-    db.run(`INSERT INTO projects (title, description, image_url, tags) VALUES (?, ?, ?, ?)`,
-        [title, description, image_url, JSON.stringify(tagsArray)],
+    const image_url = req.files['image'] ? req.files['image'][0].filename : null;
+    const cad_file = req.files['cad_file'] ? req.files['cad_file'][0].filename : null;
+
+    db.run(`INSERT INTO projects (title, description, image_url, tags, cad_file) VALUES (?, ?, ?, ?, ?)`,
+        [title, description, image_url, JSON.stringify(tagsArray), cad_file],
         function (err) {
             if (err) return res.status(500).json({ success: false, message: err.message });
             res.json({ success: true });
@@ -232,6 +235,133 @@ router.get('/messages', (req, res) => {
     db.all("SELECT * FROM messages ORDER BY created_at DESC", (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
+    });
+});
+
+// --- Dashboard Statistics ---
+router.get('/dashboard-stats', (req, res) => {
+    const stats = {};
+
+    // Get counts for all sections
+    db.get("SELECT COUNT(*) as count FROM projects", (err, row) => {
+        if (!err) stats.projects = row.count;
+
+        db.get("SELECT COUNT(*) as count FROM experience", (err, row) => {
+            if (!err) stats.experience = row.count;
+
+            db.get("SELECT COUNT(*) as count FROM skills", (err, row) => {
+                if (!err) stats.skills = row.count;
+
+                db.get("SELECT COUNT(*) as count FROM certifications", (err, row) => {
+                    if (!err) stats.certifications = row.count;
+
+                    db.get("SELECT COUNT(*) as count FROM publications", (err, row) => {
+                        if (!err) stats.publications = row.count;
+
+                        db.get("SELECT COUNT(*) as count FROM messages", (err, row) => {
+                            if (!err) stats.messages = row.count;
+                            res.json(stats);
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+
+// --- Certifications ---
+router.get('/certifications', (req, res) => {
+    db.all("SELECT * FROM certifications ORDER BY id DESC", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+router.post('/certifications/add', (req, res) => {
+    const { name, issuer, date, link, type, embed_code } = req.body;
+    db.run("INSERT INTO certifications (name, issuer, date, link, type, embed_code) VALUES (?, ?, ?, ?, ?, ?)",
+        [name, issuer, date, link, type || 'Certification', embed_code],
+        function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            res.json({ success: true, id: this.lastID });
+        }
+    );
+});
+
+router.delete('/certifications/delete/:id', (req, res) => {
+    db.run("DELETE FROM certifications WHERE id = ?", [req.params.id], function (err) {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        res.json({ success: true });
+    });
+});
+
+// --- Publications ---
+router.get('/publications', (req, res) => {
+    db.all("SELECT * FROM publications ORDER BY id DESC", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+router.post('/publications/add', (req, res) => {
+    const { title, publisher, date, link } = req.body;
+    db.run("INSERT INTO publications (title, publisher, date, link) VALUES (?, ?, ?, ?)",
+        [title, publisher, date, link],
+        function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            res.json({ success: true, id: this.lastID });
+        }
+    );
+});
+
+router.delete('/publications/delete/:id', (req, res) => {
+    db.run("DELETE FROM publications WHERE id = ?", [req.params.id], function (err) {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        res.json({ success: true });
+    });
+});
+
+// --- Notification Settings ---
+router.get('/notification-settings', (req, res) => {
+    db.get("SELECT * FROM notification_settings ORDER BY id DESC LIMIT 1", (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(row || { email_notifications: 0, whatsapp_notifications: 0 });
+    });
+});
+
+router.post('/notification-settings', (req, res) => {
+    const { email_notifications, whatsapp_notifications, notification_email, whatsapp_number } = req.body;
+
+    // Check if settings exist
+    db.get("SELECT * FROM notification_settings LIMIT 1", (err, row) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+
+        if (row) {
+            // Update existing settings
+            db.run(`UPDATE notification_settings SET 
+                email_notifications = ?, 
+                whatsapp_notifications = ?, 
+                notification_email = ?, 
+                whatsapp_number = ?
+                WHERE id = ?`,
+                [email_notifications ? 1 : 0, whatsapp_notifications ? 1 : 0, notification_email, whatsapp_number, row.id],
+                function (err) {
+                    if (err) return res.status(500).json({ success: false, message: err.message });
+                    res.json({ success: true });
+                }
+            );
+        } else {
+            // Insert new settings
+            db.run(`INSERT INTO notification_settings 
+                (email_notifications, whatsapp_notifications, notification_email, whatsapp_number) 
+                VALUES (?, ?, ?, ?)`,
+                [email_notifications ? 1 : 0, whatsapp_notifications ? 1 : 0, notification_email, whatsapp_number],
+                function (err) {
+                    if (err) return res.status(500).json({ success: false, message: err.message });
+                    res.json({ success: true });
+                }
+            );
+        }
     });
 });
 

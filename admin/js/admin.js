@@ -122,6 +122,9 @@ async function loadPersonalDetailsData() {
                 if (fileNameDisplay) fileNameDisplay.textContent = `Current: ${data.profile_picture}`;
             }
         }
+
+        // Also load About data since it's now on the same page
+        loadAboutData();
     } catch (error) {
         console.error('Error loading personal details:', error);
     }
@@ -168,24 +171,51 @@ if (editPersonalForm) {
 
         const formData = new FormData(editPersonalForm);
 
+        // Extract About data to send separately or handle in backend
+        // For now, we'll send two requests: one for personal details, one for about
+        // Ideally, the backend would handle a single request, but we're adapting the frontend first
+
+        const aboutData = {
+            summary: formData.get('summary'),
+            experience_years: formData.get('experience_years'),
+            projects_completed: formData.get('projects_completed'),
+            companies_count: formData.get('companies_count')
+        };
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/personal-details`, {
+            // 1. Save Personal Details
+            const personalResponse = await fetch(`${API_BASE_URL}/api/admin/personal-details`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData // Send as FormData for file upload
             });
 
-            const result = await response.json();
+            const personalResult = await personalResponse.json();
 
-            if (result.success) {
-                alert('Personal details saved successfully!');
-                loadPersonalDetailsData(); // Reload to show updated data/image
-            } else {
-                alert('Error saving data: ' + (result.message || 'Unknown error'));
+            if (!personalResult.success) {
+                throw new Error('Error saving personal details: ' + (personalResult.message || 'Unknown error'));
             }
+
+            // 2. Save About Details
+            const aboutResponse = await fetch(`${API_BASE_URL}/api/admin/about`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(aboutData)
+            });
+
+            const aboutResult = await aboutResponse.json();
+
+            if (!aboutResult.success) {
+                throw new Error('Error saving about details: ' + (aboutResult.message || 'Unknown error'));
+            }
+
+            alert('All details saved successfully!');
+            loadPersonalDetailsData(); // Reload to show updated data/image
+
         } catch (error) {
-            console.error('Error saving personal details:', error);
-            alert('Error saving data. Please check console for details.');
+            console.error('Error saving details:', error);
+            alert(error.message || 'Error saving data. Please check console for details.');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
@@ -210,28 +240,7 @@ async function loadAboutData() {
     }
 }
 
-const editAboutForm = document.getElementById('edit-about-form');
-if (editAboutForm) {
-    editAboutForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(editAboutForm);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/about`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            if (result.success) alert('Saved successfully!');
-            else alert('Error saving data');
-        } catch (error) {
-            console.error('Error saving about data:', error);
-        }
-    });
-}
+// About form handler removed as it is merged into personal details
 
 // --- Experience Section ---
 async function loadExperienceData() {
@@ -243,7 +252,8 @@ async function loadExperienceData() {
         container.innerHTML = data.map(item => `
             <div class="item-card">
                 <div>
-                    <strong>${item.title}</strong> at ${item.company} (${item.period})
+                    <strong>${item.title}</strong> at ${item.company} <br>
+                    <small>${item.location || ''} | ${item.period}</small>
                 </div>
                 <button class="btn btn-danger btn-sm" onclick="deleteExperience(${item.id})">Delete</button>
             </div>
@@ -259,6 +269,11 @@ if (addExperienceForm) {
         e.preventDefault();
         const formData = new FormData(addExperienceForm);
         const data = Object.fromEntries(formData.entries());
+
+        // Combine start and end date into period
+        data.period = `${data.start_date} - ${data.end_date}`;
+        delete data.start_date;
+        delete data.end_date;
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/admin/experience/add`, {
@@ -352,8 +367,12 @@ async function loadProjectsData() {
 
         container.innerHTML = data.map(item => `
             <div class="item-card">
-                <div>
-                    <strong>${item.title}</strong>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    ${item.image_url ? `<img src="/uploads/profile/${item.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : ''}
+                    <div>
+                        <strong>${item.title}</strong>
+                        ${item.cad_file ? `<br><small><a href="/uploads/profile/${item.cad_file}" target="_blank">Download CAD</a></small>` : ''}
+                    </div>
                 </div>
                 <button class="btn btn-danger btn-sm" onclick="deleteProject(${item.id})">Delete</button>
             </div>
@@ -368,22 +387,20 @@ if (addProjectForm) {
     addProjectForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(addProjectForm);
-        const data = Object.fromEntries(formData.entries());
-
         try {
             const response = await fetch(`${API_BASE_URL}/api/admin/projects/add`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify(data)
+                body: formData // Send as FormData for file upload
             });
             const result = await response.json();
             if (result.success) {
                 addProjectForm.reset();
                 loadProjectsData();
-            } else alert('Error adding project');
+            } else alert('Error adding project: ' + (result.message || 'Unknown error'));
         } catch (error) {
             console.error('Error adding project:', error);
+            alert('Error adding project');
         }
     });
 }
@@ -416,5 +433,185 @@ async function loadMessagesData() {
         `).join('');
     } catch (error) {
         console.error('Error loading messages:', error);
+    }
+}
+
+// --- File Upload UI Helper ---
+function setupFileUploads() {
+    const inputs = document.querySelectorAll('.file-upload-input');
+    inputs.forEach(input => {
+        input.addEventListener('change', function (e) {
+            const fileName = e.target.files[0]?.name;
+            const label = e.target.nextElementSibling;
+            const span = label.querySelector('span');
+
+            if (fileName) {
+                span.textContent = fileName;
+                label.classList.add('has-file');
+            } else {
+                span.textContent = input.id.includes('image') ? 'Choose Image' : 'Choose CAD File';
+                label.classList.remove('has-file');
+            }
+        });
+    });
+}
+
+// Initialize file uploads on load
+document.addEventListener('DOMContentLoaded', setupFileUploads);
+
+// --- Dashboard Statistics ---
+async function loadDashboardStats() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/dashboard-stats`, { credentials: 'include' });
+        const stats = await response.json();
+
+        // Update stat cards
+        if (document.getElementById('projects-count')) {
+            document.getElementById('projects-count').textContent = stats.projects || 0;
+        }
+        if (document.getElementById('experience-count')) {
+            document.getElementById('experience-count').textContent = stats.experience || 0;
+        }
+        if (document.getElementById('skills-count')) {
+            document.getElementById('skills-count').textContent = stats.skills || 0;
+        }
+        if (document.getElementById('certifications-count')) {
+            document.getElementById('certifications-count').textContent = stats.certifications || 0;
+        }
+        if (document.getElementById('publications-count')) {
+            document.getElementById('publications-count').textContent = stats.publications || 0;
+        }
+        if (document.getElementById('messages-count')) {
+            document.getElementById('messages-count').textContent = stats.messages || 0;
+        }
+    } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+    }
+}
+
+// --- Certifications Section ---
+async function loadCertificationsData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/certifications`, { credentials: 'include' });
+        const data = await response.json();
+        const container = document.getElementById('certifications-list');
+
+        if (container) {
+            container.innerHTML = data.map(item => {
+                const typeLabel = `<span style="display: inline-block; padding: 0.25rem 0.5rem; background: ${item.type === 'Badge' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(102, 126, 234, 0.2)'}; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">${item.type || 'Certification'}</span>`;
+
+                let embedDisplay = '';
+                if (item.embed_code) {
+                    embedDisplay = `<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px;"><small>Has Embed Code</small></div>`;
+                }
+
+                return `
+                    <div class="item-card">
+                        <div>
+                            ${typeLabel}<br>
+                            <strong>${item.name}</strong> - ${item.issuer}<br>
+                            <small>${item.date} ${item.link ? `| <a href="${item.link}" target="_blank">View</a>` : ''}</small>
+                            ${embedDisplay}
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCertification(${item.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (error) {
+        console.error('Error loading certifications:', error);
+    }
+}
+
+const addCertificationForm = document.getElementById('add-certification-form');
+if (addCertificationForm) {
+    addCertificationForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(addCertificationForm);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/certifications/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (result.success) {
+                addCertificationForm.reset();
+                loadCertificationsData();
+            } else alert('Error adding certification');
+        } catch (error) {
+            console.error('Error adding certification:', error);
+        }
+    });
+}
+
+async function deleteCertification(id) {
+    if (!confirm('Are you sure?')) return;
+    try {
+        await fetch(`/api/admin/certifications/delete/${id}`, { method: 'DELETE' });
+        loadCertificationsData();
+    } catch (error) {
+        console.error('Error deleting certification:', error);
+    }
+}
+
+// --- Publications Section ---
+async function loadPublicationsData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/publications`, { credentials: 'include' });
+        const data = await response.json();
+        const container = document.getElementById('publications-list');
+
+        if (container) {
+            container.innerHTML = data.map(item => `
+                <div class="item-card">
+                    <div>
+                        <strong>${item.title}</strong> - ${item.publisher}<br>
+                        <small>${item.date} ${item.link ? `| <a href="${item.link}" target="_blank">View</a>` : ''}</small>
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="deletePublication(${item.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error loading publications:', error);
+    }
+}
+
+const addPublicationForm = document.getElementById('add-publication-form');
+if (addPublicationForm) {
+    addPublicationForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(addPublicationForm);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/publications/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (result.success) {
+                addPublicationForm.reset();
+                loadPublicationsData();
+            } else alert('Error adding publication');
+        } catch (error) {
+            console.error('Error adding publication:', error);
+        }
+    });
+}
+
+async function deletePublication(id) {
+    if (!confirm('Are you sure?')) return;
+    try {
+        await fetch(`/api/admin/publications/delete/${id}`, { method: 'DELETE' });
+        loadPublicationsData();
+    } catch (error) {
+        console.error('Error deleting publication:', error);
     }
 }

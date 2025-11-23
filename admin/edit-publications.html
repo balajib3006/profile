@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Skills - Admin Panel</title>
+    <title>Edit Publications - Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/admin/css/admin.css">
 </head>
@@ -18,38 +18,37 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <h1 class="page-title">Manage Skills</h1>
+                <h1 class="page-title">Manage Publications</h1>
             </header>
 
             <div class="content-area">
-                <!-- Add New Skill -->
+                <!-- Add New Publication -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Add New Skill</h3>
+                        <h3 class="card-title">Add New Publication</h3>
                     </div>
-                    <form id="add-skill-form">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <form id="add-publication-form">
+                        <div class="form-group">
+                            <label class="form-label">Publication Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Publisher</label>
+                            <input type="text" name="publisher" class="form-control" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
-                                <label class="form-label">Category</label>
-                                <select name="category" class="form-control">
-                                    <option value="Frontend">Frontend</option>
-                                    <option value="Backend">Backend</option>
-                                    <option value="Tools">Tools</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                <label class="form-label">Date/Year</label>
+                                <input type="text" name="date" class="form-control" placeholder="e.g. 2023" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Skill Name</label>
-                                <input type="text" name="name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Proficiency (%)</label>
-                                <input type="number" name="level" class="form-control" min="0" max="100" required>
+                                <label class="form-label">Link (Optional)</label>
+                                <input type="url" name="link" class="form-control">
                             </div>
                         </div>
                         <div style="text-align: right;">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Skill
+                                <i class="fas fa-plus"></i> Add Publication
                             </button>
                         </div>
                     </form>
@@ -58,9 +57,9 @@
                 <!-- List -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Current Skills</h3>
+                        <h3 class="card-title">Current Publications</h3>
                     </div>
-                    <div id="skills-list" class="item-list">
+                    <div id="publications-list" class="item-list">
                         <!-- Dynamic Content -->
                     </div>
                 </div>
@@ -71,7 +70,7 @@
     <script src="/admin/js/admin.js"></script>
     <script>
         checkAuth();
-        loadSkillsData();
+        loadPublicationsData();
     </script>
 </body>
 

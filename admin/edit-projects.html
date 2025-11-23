@@ -7,60 +7,67 @@
     <title>Edit Projects - Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        /* Custom File Upload Styling */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: 0.875rem 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: var(--primary-color);
+            color: var(--primary-light);
+        }
+
+        .file-upload-label i {
+            font-size: 1.2rem;
+        }
+
+        .file-upload-input:focus+.file-upload-label {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .file-upload-label.has-file {
+            border-style: solid;
+            border-color: var(--success-color);
+            color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+    </style>
 </head>
 
 <body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-bolt" style="color: var(--primary-color); font-size: 1.5rem;"></i>
-                <h2>Admin</h2>
-            </div>
-
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="/admin/dashboard.html">
-                        <i class="fas fa-home"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-personal.html">
-                        <i class="fas fa-id-card"></i> Personal Details
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-about.html">
-                        <i class="fas fa-user"></i> About
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-experience.html">
-                        <i class="fas fa-briefcase"></i> Experience
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-skills.html">
-                        <i class="fas fa-code"></i> Skills
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-projects.html" class="active">
-                        <i class="fas fa-project-diagram"></i> Projects
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/messages.html">
-                        <i class="fas fa-envelope"></i> Messages
-                    </a>
-                </li>
-            </ul>
-
-            <div class="sidebar-footer">
-                <button id="logout-btn" class="btn btn-danger btn-sm" style="width: 100%; justify-content: center;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
+    <div class="admin-layout">        <!-- Sidebar -->
+        <aside class="sidebar" id="admin-sidebar">
+            <!-- Dynamically loaded by sidebar.js -->
         </aside>
 
         <!-- Main Content -->
@@ -75,7 +82,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Add New Project</h3>
                     </div>
-                    <form id="add-project-form">
+                    <form id="add-project-form" enctype="multipart/form-data">
                         <div class="form-group">
                             <label class="form-label">Project Title</label>
                             <input type="text" name="title" class="form-control" required>
@@ -86,13 +93,31 @@
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
-                                <label class="form-label">Image URL</label>
-                                <input type="text" name="image_url" class="form-control">
+                                <label class="form-label">Project Image</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="image" id="image-input" class="file-upload-input"
+                                        accept="image/*">
+                                    <label for="image-input" class="file-upload-label">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>Choose Image</span>
+                                    </label>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Tags (JSON array)</label>
-                                <input type="text" name="tags" class="form-control" placeholder='["React", "Node"]'>
+                                <label class="form-label">CAD File (.step, .stp, .iges)</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="cad_file" id="cad-input" class="file-upload-input"
+                                        accept=".step,.stp,.iges">
+                                    <label for="cad-input" class="file-upload-label">
+                                        <i class="fas fa-file-upload"></i>
+                                        <span>Choose CAD File</span>
+                                    </label>
+                                </div>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tags (JSON array)</label>
+                            <input type="text" name="tags" class="form-control" placeholder='["React", "Node"]'>
                         </div>
                         <div style="text-align: right;">
                             <button type="submit" class="btn btn-primary">

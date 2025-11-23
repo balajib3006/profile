@@ -91,12 +91,32 @@ function initDatabase() {
             message TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
+
+        // Certifications Table
+        db.run(`CREATE TABLE IF NOT EXISTS certifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            issuer TEXT,
+            date TEXT,
+            link TEXT,
+            type TEXT DEFAULT 'Certification',
+            embed_code TEXT
+        )`);
+
+        // Publications Table
+        db.run(`CREATE TABLE IF NOT EXISTS publications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            publisher TEXT,
+            date TEXT,
+            link TEXT
+        )`);
     });
 }
 
 function createDefaultAdmin() {
     const username = 'admin';
-    const password = 'password123';
+    const password = 'admin123';
     const saltRounds = 10;
 
     db.get("SELECT * FROM users WHERE username = ?", [username], (err, row) => {

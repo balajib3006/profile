@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Certifications & Badges - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+
+<body>
+    <div class="admin-layout">        <!-- Sidebar -->
+        <aside class="sidebar" id="admin-sidebar">
+            <!-- Dynamically loaded by sidebar.js -->
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 class="page-title">Manage Certifications & Badges</h1>
+            </header>
+
+            <div class="content-area">
+                <!-- Add New Certification/Badge -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Add New Certification / Badge</h3>
+                    </div>
+                    <form id="add-certification-form">
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-control" required>
+                                <option value="Certification">Certification</option>
+                                <option value="Badge">Badge</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Issuer</label>
+                            <input type="text" name="issuer" class="form-control" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Date/Year</label>
+                                <input type="text" name="date" class="form-control" placeholder="e.g. 2023" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Link (Optional)</label>
+                                <input type="url" name="link" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Embed Code (Optional)</label>
+                            <textarea name="embed_code" class="form-control" rows="3"
+                                placeholder="Paste embed code from Credly, Accredible, or similar platforms"></textarea>
+                            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                                <i class="fas fa-info-circle"></i> If provided, this will be displayed instead of the
+                                link
+                            </small>
+                        </div>
+                        <div style="text-align: right;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Current Certifications & Badges</h3>
+                    </div>
+                    <div id="certifications-list" class="item-list">
+                        <!-- Dynamic Content -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/admin/js/admin.js"></script>
+    <script>
+        checkAuth();
+        loadCertificationsData();
+    </script>
+</body>
+
+</html>

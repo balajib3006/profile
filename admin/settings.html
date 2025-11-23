@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+
+<body>
+    <div class="admin-layout">        <!-- Sidebar -->
+        <aside class="sidebar" id="admin-sidebar">
+            <!-- Dynamically loaded by sidebar.js -->
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 class="page-title">Notification Settings</h1>
+            </header>
+
+            <div class="content-area">
+                <!-- Email Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-envelope" style="margin-right: 0.5rem;"></i> Email
+                            Notifications</h3>
+                    </div>
+                    <form id="notification-settings-form">
+                        <div class="form-group">
+                            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="email_notifications" name="email_notifications">
+                                <span>Enable Email Notifications</span>
+                            </label>
+                            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                                <i class="fas fa-info-circle"></i> Receive an email when someone submits a contact form
+                            </small>
+                        </div>
+
+                        <div class="form-group" id="email-settings" style="display: none;">
+                            <label class="form-label">Notification Email Address</label>
+                            <input type="email" id="notification_email" name="notification_email" class="form-control"
+                                placeholder="your-email@example.com">
+                            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                                <i class="fas fa-info-circle"></i> This email will receive notification alerts
+                            </small>
+                        </div>
+
+                        <div
+                            style="background: rgba(102, 126, 234, 0.1); padding: 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--primary-color);">
+                            <strong style="color: var(--primary-color);">📧 Setup Instructions:</strong>
+                            <ol style="margin: 0.5rem 0 0 1.5rem; color: var(--text-secondary);">
+                                <li>Update your <code>.env</code> file with SMTP credentials</li>
+                                <li>For Gmail, use App Passwords: <a href="https://myaccount.google.com/apppasswords"
+                                        target="_blank" style="color: var(--primary-color);">Generate Here</a></li>
+                                <li>Restart the server after updating .env file</li>
+                            </ol>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- WhatsApp Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fab fa-whatsapp" style="margin-right: 0.5rem;"></i> WhatsApp
+                            Notifications (Optional)</h3>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="whatsapp_notifications" name="whatsapp_notifications">
+                                <span>Enable WhatsApp Notifications</span>
+                            </label>
+                            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                                <i class="fas fa-info-circle"></i> Receive a WhatsApp message when someone contacts you
+                            </small>
+                        </div>
+
+                        <div class="form-group" id="whatsapp-settings" style="display: none;">
+                            <label class="form-label">WhatsApp Number (with country code)</label>
+                            <input type="tel" id="whatsapp_number" name="whatsapp_number" class="form-control"
+                                placeholder="+1234567890">
+                            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                                <i class="fas fa-info-circle"></i> Include country code (e.g., +1 for US)
+                            </small>
+                        </div>
+
+                        <div
+                            style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--warning-color);">
+                            <strong style="color: var(--warning-color);">⚠️ Twilio Required:</strong>
+                            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">
+                                WhatsApp notifications require a Twilio account. Sign up at <a
+                                    href="https://www.twilio.com" target="_blank"
+                                    style="color: var(--warning-color);">twilio.com</a> and add your credentials to the
+                                .env file.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" form="notification-settings-form" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/admin/js/admin.js"></script>
+    <script>
+        checkAuth();
+
+        // Toggle email settings visibility
+        document.getElementById('email_notifications').addEventListener('change', function () {
+            document.getElementById('email-settings').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Toggle WhatsApp settings visibility
+        document.getElementById('whatsapp_notifications').addEventListener('change', function () {
+            document.getElementById('whatsapp-settings').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Load current settings
+        async function loadNotificationSettings() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/notification-settings`, { credentials: 'include' });
+                const settings = await response.json();
+
+                if (settings) {
+                    document.getElementById('email_notifications').checked = settings.email_notifications === 1;
+                    document.getElementById('whatsapp_notifications').checked = settings.whatsapp_notifications === 1;
+                    document.getElementById('notification_email').value = settings.notification_email || '';
+                    document.getElementById('whatsapp_number').value = settings.whatsapp_number || '';
+
+                    // Show/hide settings based on checkboxes
+                    document.getElementById('email-settings').style.display = settings.email_notifications ? 'block' : 'none';
+                    document.getElementById('whatsapp-settings').style.display = settings.whatsapp_notifications ? 'block' : 'none';
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        // Save settings
+        document.getElementById('notification-settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const settings = {
+                email_notifications: document.getElementById('email_notifications').checked,
+                whatsapp_notifications: document.getElementById('whatsapp_notifications').checked,
+                notification_email: document.getElementById('notification_email').value,
+                whatsapp_number: document.getElementById('whatsapp_number').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/notification-settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(settings)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Settings saved successfully!');
+                } else {
+                    alert('❌ Error saving settings: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert('❌ Error saving settings');
+            }
+        });
+
+        // Load settings on page load
+        loadNotificationSettings();
+    </script>
+</body>
+
+</html>

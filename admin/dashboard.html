@@ -26,12 +26,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="/admin/edit-personal.html">
-                        <i class="fas fa-id-card"></i> Personal Details
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-about.html">
-                        <i class="fas fa-user"></i> About
+                        <i class="fas fa-id-card"></i> Personal & About
                     </a>
                 </li>
                 <li class="nav-item">
@@ -50,8 +45,23 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="/admin/edit-certifications.html">
+                        <i class="fas fa-certificate"></i> Certifications & Badges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/edit-publications.html">
+                        <i class="fas fa-book"></i> Publications
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/admin/messages.html">
                         <i class="fas fa-envelope"></i> Messages
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/settings.html">
+                        <i class="fas fa-cog"></i> Settings
                     </a>
                 </li>
             </ul>
@@ -76,35 +86,63 @@
             </header>
 
             <div class="content-area">
-                <!-- Stats Grid -->
+                <!-- Portfolio Statistics -->
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-eye"></i>
+                        <div class="stat-icon"
+                            style="background: rgba(102, 126, 234, 0.1); color: var(--primary-color);">
+                            <i class="fas fa-project-diagram"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>Active</h3>
-                            <p>Site Status</p>
+                            <h3 id="projects-count">-</h3>
+                            <p>Projects</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"
                             style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">
-                            <i class="fas fa-check-circle"></i>
+                            <i class="fas fa-briefcase"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>System</h3>
-                            <p>Operational</p>
+                            <h3 id="experience-count">-</h3>
+                            <p>Experience</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"
                             style="background: rgba(245, 158, 11, 0.1); color: var(--warning-color);">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-code"></i>
                         </div>
                         <div class="stat-info">
-                            <h3 id="last-login">-</h3>
-                            <p>Last Login</p>
+                            <h3 id="skills-count">-</h3>
+                            <p>Skills</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="certifications-count">-</h3>
+                            <p>Certifications</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="publications-count">-</h3>
+                            <p>Publications</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="messages-count">-</h3>
+                            <p>Messages</p>
                         </div>
                     </div>
                 </div>
@@ -114,13 +152,29 @@
                     <div class="card-header">
                         <h3 class="card-title">Quick Actions</h3>
                     </div>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                         <a href="/admin/edit-projects.html" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Add Project
+                        </a>
+                        <a href="/admin/edit-experience.html" class="btn"
+                            style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                            <i class="fas fa-plus"></i> Add Experience
+                        </a>
+                        <a href="/admin/edit-certifications.html" class="btn"
+                            style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                            <i class="fas fa-plus"></i> Add Certification
+                        </a>
+                        <a href="/admin/edit-personal.html" class="btn"
+                            style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                            <i class="fas fa-edit"></i> Edit Profile
                         </a>
                         <a href="/admin/messages.html" class="btn"
                             style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
                             <i class="fas fa-inbox"></i> View Messages
+                        </a>
+                        <a href="/" target="_blank" class="btn"
+                            style="background: var(--bg-tertiary); border: 1px solid var(--success-color); color: var(--success-color);">
+                            <i class="fas fa-globe"></i> View Live Site
                         </a>
                     </div>
                 </div>
@@ -131,7 +185,7 @@
     <script src="/admin/js/admin.js"></script>
     <script>
         checkAuth();
-        document.getElementById('last-login').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        loadDashboardStats();
     </script>
 </body>
 

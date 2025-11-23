@@ -10,57 +10,9 @@
 </head>
 
 <body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-bolt" style="color: var(--primary-color); font-size: 1.5rem;"></i>
-                <h2>Admin</h2>
-            </div>
-
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="/admin/dashboard.html">
-                        <i class="fas fa-home"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-personal.html">
-                        <i class="fas fa-id-card"></i> Personal Details
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-about.html">
-                        <i class="fas fa-user"></i> About
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-experience.html" class="active">
-                        <i class="fas fa-briefcase"></i> Experience
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-skills.html">
-                        <i class="fas fa-code"></i> Skills
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/edit-projects.html">
-                        <i class="fas fa-project-diagram"></i> Projects
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/messages.html">
-                        <i class="fas fa-envelope"></i> Messages
-                    </a>
-                </li>
-            </ul>
-
-            <div class="sidebar-footer">
-                <button id="logout-btn" class="btn btn-danger btn-sm" style="width: 100%; justify-content: center;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
+    <div class="admin-layout">        <!-- Sidebar -->
+        <aside class="sidebar" id="admin-sidebar">
+            <!-- Dynamically loaded by sidebar.js -->
         </aside>
 
         <!-- Main Content -->
@@ -87,8 +39,21 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Period (e.g., 2021 - Present)</label>
-                            <input type="text" name="period" class="form-control" required>
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" placeholder="e.g. New York, USA"
+                                required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Start Date</label>
+                                <input type="text" name="start_date" class="form-control" placeholder="e.g. Jan 2021"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">End Date</label>
+                                <input type="text" name="end_date" class="form-control" placeholder="e.g. Present"
+                                    required>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Responsibilities (JSON array or text)</label>
