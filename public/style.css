@@ -465,19 +465,6 @@ a {
   left: 50%;
   transform: translateX(-50%);
   width: 60px;
-  height: 3px;
-  background: var(--primary-color);
-  border-radius: var(--radius-full);
-}
-
-.section-subtitle {
-  color: var(--text-muted);
-  font-size: 1.1rem;
-}
-
-/* Experience Timeline */
-.timeline {
-  position: relative;
   max-width: 900px;
   margin: 0 auto;
 }

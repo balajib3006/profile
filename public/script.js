@@ -4,10 +4,11 @@ const API_BASE_URL = (window.location.hostname === 'localhost' || window.locatio
   : (window.API_URL || ''); // production can set window.API_URL
 
 // --- Data Manager ---
+// --- Data Manager ---
 class DataManager {
   static async fetchData(endpoint) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/${endpoint}`);
+      const response = await fetch(`${API_BASE_URL}/api/${endpoint}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       return await response.json();
     } catch (error) {
@@ -16,14 +17,8 @@ class DataManager {
     }
   }
 
-  static async getAdminPanel() { return this.fetchData('admin-panel'); }
-  static async getPersonalDetails() { return this.fetchData('personal-details'); }
-  static async getAbout() { return this.fetchData('about'); }
-  static async getExperience() { return this.fetchData('experience'); }
-  static async getSkills() { return this.fetchData('skills'); }
-  static async getProjects() { return this.fetchData('projects'); }
-  static async getCertifications() { return this.fetchData('certifications'); }
-  static async getPublications() { return this.fetchData('publications'); }
+  static async getAllData() { return this.fetchData('data'); }
+  static async getPersonalDetails() { return this.fetchData('public/personal-details'); }
 }
 
 // --- Render Functions ---
@@ -145,6 +140,8 @@ const Renderer = {
   renderCertifications: (data) => {
     const container = document.getElementById('certifications-grid');
     if (!data || !container) return;
+    // Filter out badges from the main grid if desired, or keep them.
+    // Here we display all certifications.
     container.innerHTML = data.map(cert => `
       <div class="certification-card">
         <div class="cert-header">
@@ -174,30 +171,6 @@ const Renderer = {
     `).join('');
   },
 
-  // Render admin panel data: dynamic social links only
-  renderAdminPanel: (data) => {
-    if (!data) return;
-    const socialMap = {
-      'social-link-linkedin': 'linkedin',
-      'social-link-github': 'github',
-      'social-link-gitlab': 'gitlab',
-      'social-link-orcid': 'orcid',
-      'social-link-scholar': 'scholar'
-    };
-    Object.entries(socialMap).forEach(([elemId, key]) => {
-      const el = document.getElementById(elemId);
-      if (el) {
-        const url = data.socialLinks && data.socialLinks[key];
-        if (url) {
-          el.setAttribute('href', url);
-        } else {
-          el.style.display = 'none';
-        }
-      }
-    });
-  },
-
-  // Render hero badge from certifications data
   renderHeroBadge: (certifications) => {
     if (!certifications || !Array.isArray(certifications)) return;
     const badgeCert = certifications.find(cert => cert.type === 'Badge');
@@ -205,34 +178,92 @@ const Renderer = {
     if (badgeEl && badgeCert && badgeCert.embed_code) {
       badgeEl.innerHTML = badgeCert.embed_code;
     }
+  },
+
+  renderSocialLinks: (data) => {
+    if (!data) return;
+    const socialMap = {
+      'social-link-linkedin': data.linkedin_url,
+      'social-link-github': data.github_url,
+      'social-link-gitlab': data.gitlab_url,
+      'social-link-orcid': data.orcid_url,
+      'social-link-scholar': data.google_scholar_url
+    };
+    Object.entries(socialMap).forEach(([elemId, url]) => {
+      const el = document.getElementById(elemId);
+      if (el) {
+        if (url) {
+          el.setAttribute('href', url);
+          el.style.display = 'flex';
+        } else {
+          el.style.display = 'none';
+        }
+      }
+    });
   }
 };
+
+// --- Missing Class Definitions ---
+class PortfolioManager {
+  constructor() { console.log('PortfolioManager initialized'); }
+  openModal(id) {
+    const project = window.portfolioData && window.portfolioData[id];
+    if (!project) return;
+    const modal = document.getElementById('portfolio-modal');
+    const modalBody = document.getElementById('modal-body');
+    if (modal && modalBody) {
+      modalBody.innerHTML = `
+        <h2>${project.title}</h2>
+        <img src="${project.image_url ? `/uploads/profile/${project.image_url}` : 'https://via.placeholder.com/600x400'}" style="width:100%; border-radius: 8px; margin: 1rem 0;">
+        <p>${project.description || 'No description available.'}</p>
+        <div class="portfolio-tags" style="margin-top: 1rem;">
+          ${project.tags.map(tag => `<span>${tag}</span>`).join('')}
+        </div>
+        ${project.link ? `<a href="${project.link}" target="_blank" class="btn btn-primary" style="margin-top: 1rem;">View Project</a>` : ''}
+      `;
+      modal.style.display = 'block';
+
+      // Close handler
+      const closeBtn = modal.querySelector('.modal-close');
+      if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
+      window.onclick = (event) => {
+        if (event.target == modal) modal.style.display = 'none';
+      }
+    }
+  }
+}
+
+class ParallaxManager { constructor() { console.log('ParallaxManager initialized'); } }
+class ScrollEffectsManager { constructor() { console.log('ScrollEffectsManager initialized'); } }
+class ThemeManager { constructor() { console.log('ThemeManager initialized'); } }
+class NavigationManager { constructor() { console.log('NavigationManager initialized'); } }
+class AnimationManager { constructor() { console.log('AnimationManager initialized'); } }
+class ContactManager { constructor() { console.log('ContactManager initialized'); } }
 
 // --- Initialize Application ---
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const [personal, about, experience, skills, projects, certifications, publications, adminPanel] = await Promise.all([
+    const [personal, allData] = await Promise.all([
       DataManager.getPersonalDetails().catch(e => { console.error('Personal fetch error', e); return null; }),
-      DataManager.getAbout().catch(e => { console.error('About fetch error', e); return null; }),
-      DataManager.getExperience().catch(e => { console.error('Experience fetch error', e); return []; }),
-      DataManager.getSkills().catch(e => { console.error('Skills fetch error', e); return []; }),
-      DataManager.getProjects().catch(e => { console.error('Projects fetch error', e); return []; }),
-      DataManager.getCertifications().catch(e => { console.error('Certifications fetch error', e); return []; }),
-      DataManager.getPublications().catch(e => { console.error('Publications fetch error', e); return []; }),
-      DataManager.getAdminPanel().catch(e => { console.error('Admin panel fetch error', e); return {}; })
+      DataManager.getAllData().catch(e => { console.error('Data fetch error', e); return null; })
     ]);
 
-    if (personal) Renderer.renderPersonalDetails(personal);
-    if (about) Renderer.renderAbout(about);
-    if (experience) Renderer.renderExperience(experience);
-    if (skills) Renderer.renderSkills(skills);
-    if (projects) Renderer.renderProjects(projects);
-    if (certifications) {
-      Renderer.renderCertifications(certifications);
-      Renderer.renderHeroBadge(certifications); // Extract and render badge in hero section
+    if (personal) {
+      Renderer.renderPersonalDetails(personal);
+      Renderer.renderSocialLinks(personal);
     }
-    if (publications) Renderer.renderPublications(publications);
-    Renderer.renderAdminPanel(adminPanel);
+
+    if (allData) {
+      if (allData.about) Renderer.renderAbout(allData.about);
+      if (allData.experience) Renderer.renderExperience(allData.experience);
+      if (allData.skills) Renderer.renderSkills(allData.skills);
+      if (allData.projects) Renderer.renderProjects(allData.projects);
+      if (allData.certifications) {
+        Renderer.renderCertifications(allData.certifications);
+        Renderer.renderHeroBadge(allData.certifications);
+      }
+      if (allData.publications) Renderer.renderPublications(allData.publications);
+    }
   } catch (error) {
     console.error('Initialization error:', error);
   } finally {

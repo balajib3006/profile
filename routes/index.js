@@ -46,7 +46,19 @@ router.get('/api/data', (req, res) => {
                         tags: JSON.parse(proj.tags || '[]')
                     }));
 
-                    res.json(data);
+                    // Fetch Certifications
+                    db.all("SELECT * FROM certifications ORDER BY id DESC", (err, certifications) => {
+                        if (err) return res.status(500).json({ error: err.message });
+                        data.certifications = certifications;
+
+                        // Fetch Publications
+                        db.all("SELECT * FROM publications ORDER BY id DESC", (err, publications) => {
+                            if (err) return res.status(500).json({ error: err.message });
+                            data.publications = publications;
+
+                            res.json(data);
+                        });
+                    });
                 });
             });
         });
