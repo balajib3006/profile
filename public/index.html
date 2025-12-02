@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="portfolioApp">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Professional profile of Balaji B, Associate Engineer specializing in hardware design, PCB development, and antenna systems">
+  <title>{{personal.name}} - {{currentDesignation}}</title>
+  <!-- <meta name="description"
+    content="Professional profile of {{personal.name}}, Associate Engineer specializing in hardware design, PCB development, and antenna systems"> -->
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
 </head>
 
-<body>
+<body ng-controller="MainController">
   <!-- Parallax Background Elements -->
   <div class="parallax-bg">
     <div class="parallax-layer parallax-layer-1"></div>
@@ -25,260 +27,323 @@
     <div class="parallax-layer parallax-layer-3"></div>
   </div>
 
-  <!-- Floating Particles -->
-  <div class="floating-particles"></div>
-
   <!-- Navigation -->
-  <nav class="navbar">
-    <div class="nav-container">
+  <nav class="navbar" ng-class="{'scrolled': isScrolled}">
+    <div class="container nav-container">
       <div class="nav-logo">
-        <span id="nav-logo-name">Balaji B</span>
+        <span id="nav-logo-name" ng-bind="personal.name">Balaji B</span>
       </div>
-      <div class="nav-menu">
-        <a href="#about" class="nav-link">About</a>
-        <a href="#experience" class="nav-link">Experience</a>
-        <a href="#skills" class="nav-link">Skills</a>
-        <a href="#portfolio" class="nav-link">Portfolio</a>
-        <a href="#contact" class="nav-link">Contact</a>
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn" ng-click="toggleMobileMenu()" aria-label="Toggle Menu">
+        <i class="fas" ng-class="mobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+      </button>
+
+      <div class="nav-menu" ng-class="{'active': mobileMenuOpen}">
+        <a href="#about" class="nav-link" ng-click="closeMobileMenu()">About</a>
+        <a href="#experience" class="nav-link" ng-click="closeMobileMenu()">Experience</a>
+        <a href="#skills" class="nav-link" ng-click="closeMobileMenu()">Skills</a>
+        <a href="#portfolio" class="nav-link" ng-click="closeMobileMenu()">Portfolio</a>
+        <a href="#contact" class="nav-link" ng-click="closeMobileMenu()">Contact</a>
+
+        <!-- Mobile Social Icons (visible only in mobile menu) -->
+        <div class="nav-actions mobile-only" style="margin-top: 1rem; justify-content: center;">
+          <a ng-href="{{personal.linkedin_url}}" target="_blank" class="social-link" ng-if="personal.linkedin_url"><i
+              class="fab fa-linkedin"></i></a>
+          <a ng-href="{{personal.github_url}}" target="_blank" class="social-link" ng-if="personal.github_url"><i
+              class="fab fa-github"></i></a>
+          <a href="/business-card/" class="action-btn" target="_blank"><i class="fas fa-id-card"></i></a>
+        </div>
       </div>
-      <div class="nav-actions">
-        <div class="social-icons">
-          <!-- Social icons visible but with placeholder links (not connected to admin panel) -->
-          <a href="#" target="_blank" aria-label="LinkedIn" class="social-link" id="social-link-linkedin">
+
+      <div class="nav-actions desktop-only">
+        <div class="social-icons" style="display: flex; gap: 0.5rem;">
+          <a ng-href="{{personal.linkedin_url}}" target="_blank" aria-label="LinkedIn" class="social-link"
+            ng-if="personal.linkedin_url">
             <i class="fab fa-linkedin"></i>
           </a>
-          <a href="#" target="_blank" aria-label="GitHub" class="social-link" id="social-link-github">
+          <a ng-href="{{personal.github_url}}" target="_blank" aria-label="GitHub" class="social-link"
+            ng-if="personal.github_url">
             <i class="fab fa-github"></i>
           </a>
-          <a href="#" target="_blank" aria-label="GitLab" class="social-link" id="social-link-gitlab">
+          <a ng-href="{{personal.gitlab_url}}" target="_blank" aria-label="GitLab" class="social-link"
+            ng-if="personal.gitlab_url">
             <i class="fab fa-gitlab"></i>
           </a>
-          <a href="#" target="_blank" aria-label="ORCID" class="social-link" id="social-link-orcid">
+          <a ng-href="{{personal.orcid_url}}" target="_blank" aria-label="ORCID" class="social-link"
+            ng-if="personal.orcid_url">
             <i class="fab fa-orcid"></i>
           </a>
-          <a href="#" target="_blank" aria-label="Google Scholar" class="social-link" id="social-link-scholar">
+          <a ng-href="{{personal.google_scholar_url}}" target="_blank" aria-label="Google Scholar" class="social-link"
+            ng-if="personal.google_scholar_url">
             <i class="fas fa-graduation-cap"></i>
           </a>
         </div>
-        <!-- Open business card in a new tab -->
-        <a href="business-card/index.html" class="action-btn" target="_blank" rel="noopener"
-          aria-label="Open Business Card">
-          <i class="fas fa-address-card"></i>
-        </a>
+        <a href="/business-card/" class="btn btn-primary" target="_blank">Digital Card</a>
       </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
   <section class="hero">
-    <div class="hero-container">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1 class="hero-title">
-            <span class="title-line">Hi, I'm</span>
-            <span class="title-name" id="hero-name">Balaji B</span>
-          </h1>
-          <div id="hero-badge" class="hero-badge"></div>
-          <p class="hero-subtitle">Associate Engineer</p>
-          <p class="hero-description" id="hero-bio">
-            Specialized in hardware design, PCB development, and antenna systems with <span
-              id="hero-experience-years">1.9+</span> years of experience
-            delivering innovative electronic solutions for aerospace and advanced composites industries.
-          </p>
-          <div class="hero-actions">
-            <a href="#contact" class="btn btn-primary">
-              <i class="fas fa-envelope"></i>
-              Get In Touch
-            </a>
-            <a href="#portfolio" class="btn btn-secondary">
-              <i class="fas fa-briefcase"></i>
-              View Portfolio
-            </a>
-          </div>
-        </div>
-        <div class="hero-image">
-          <div class="image-container">
-            <img src="#" alt="Balaji B - Associate Engineer" class="profile-photo" id="hero-profile-picture">
-            <div class="image-decoration"></div>
-          </div>
+    <div class="container hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <span class="title-line">Hi, I'm</span>
+          <span class="title-name" ng-bind="personal.name">Balaji B</span>
+        </h1>
+        <p class="hero-subtitle" ng-bind="currentDesignation"></p>
+        <div id="hero-badge" class="hero-badge" ng-bind-html="trustHtml(badgeCert.embed_code)"></div>
+        <!-- <p class="hero-description">
+          <span ng-bind="personal.bio">Specialized in hardware design...</span>
+          <span ng-if="about.experience_years">with <span ng-bind="about.experience_years"></span> years of
+            experience</span>
+        </p> -->
+        <div class="hero-actions">
+          <a href="#portfolio" class="btn btn-primary">View My Work <i class="fas fa-arrow-right"></i></a>
+          <a href="#contact" class="btn btn-secondary">Get In Touch <i class="fas fa-envelope"></i></a>
         </div>
       </div>
-      <div class="scroll-indicator">
-        <div class="scroll-arrow">
-          <i class="fas fa-chevron-down"></i>
+      <div class="hero-image">
+        <div class="image-container">
+          <img ng-src="{{personal.profile_picture ? '/uploads/profile/' + personal.profile_picture : '#'}}"
+            alt="{{personal.name}}" class="profile-photo">
+          <div class="image-decoration"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <main>
-    <!-- About Section -->
-    <section id="about" class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">About Me</h2>
-          <p class="section-subtitle">Professional Summary</p>
+  <!-- About Section -->
+  <section id="about" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">About Me</h2>
+      </div>
+      <div class="about-content">
+        <div class="about-text">
+          <p ng-bind-html="trustHtml(about.summary)"></p>
         </div>
-        <div class="about-content">
-          <div class="about-text" id="about-summary">
-            <!-- Dynamic Content -->
-            <p>Accomplished engineering professional with over 1.9 years of experience in hardware and antenna design.
-            </p>
+        <div class="about-stats">
+          <div class="stat-item">
+            <div class="stat-number" ng-bind="about.experience_years"></div>
+            <div class="stat-label">Years Experience</div>
           </div>
-          <div class="about-stats">
-            <div class="stat-item">
-              <div class="stat-number" id="stat-experience">1.9+</div>
-              <div class="stat-label">Years Experience</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="stat-projects">50+</div>
-              <div class="stat-label">Projects Completed</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="stat-companies">2</div>
-              <div class="stat-label">Companies</div>
-            </div>
+          <div class="stat-item">
+            <div class="stat-number" ng-bind="about.projects_completed"></div>
+            <div class="stat-label">Projects Completed</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" ng-bind="about.companies_count"></div>
+            <div class="stat-label">Companies</div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Experience Section -->
-    <section id="experience" class="section section-alt">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Professional Experience</h2>
-          <p class="section-subtitle">My career journey</p>
-        </div>
-        <div class="timeline" id="experience-list">
-          <!-- Dynamic Content -->
-        </div>
+  <!-- Experience Section -->
+  <section id="experience" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Experience</h2>
       </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Technical Skills</h2>
-          <p class="section-subtitle">Technologies and tools I work with</p>
-        </div>
-        <div class="skills-grid" id="skills-grid">
-          <!-- Dynamic Content -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Portfolio Section -->
-    <section id="portfolio" class="section section-alt">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Portfolio</h2>
-          <p class="section-subtitle">Featured projects and designs</p>
-        </div>
-        <div class="portfolio-grid" id="portfolio-grid">
-          <!-- Dynamic Content -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Get In Touch</h2>
-          <p class="section-subtitle">Let's discuss your next project</p>
-        </div>
-        <div class="contact-content">
-          <div class="contact-info">
-            <div class="contact-item">
-              <div class="contact-icon">
-                <i class="fas fa-envelope"></i>
-              </div>
-              <div class="contact-details">
-                <h3>Email</h3>
-                <p>balaji3006@outlook.in</p>
-              </div>
+      <div class="timeline">
+        <div class="timeline-item" ng-repeat="item in experience"
+          ng-class="{'left': $index % 2 === 0, 'right': $index % 2 !== 0}">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <h3 class="job-title" ng-bind="item.title"></h3>
+              <span class="job-period" ng-bind="item.period"></span>
             </div>
-            <div class="contact-item">
-              <div class="contact-icon">
-                <i class="fas fa-map-marker-alt"></i>
-              </div>
-              <div class="contact-details">
-                <h3>Location</h3>
-                <p>Bengaluru, India</p>
-              </div>
+            <div class="company">
+              {{item.company}}
+              <span class="location-tag" ng-if="item.location"><i class="fas fa-map-marker-alt"></i>
+                {{item.location}}</span>
             </div>
-            <div class="contact-item">
-              <div class="contact-icon">
-                <i class="fas fa-phone"></i>
+            <ul class="job-responsibilities">
+              <li ng-repeat="resp in item.responsibilities" ng-bind="resp"></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Technical Skills</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-category" ng-repeat="(category, skills) in groupedSkills">
+          <h3 class="skill-category-title" ng-bind="category"></h3>
+          <div class="skill-list">
+            <div class="skill-item" ng-repeat="s in skills">
+              <div class="skill-info">
+                <span class="skill-name" ng-bind="s.name"></span>
+                <span class="skill-percentage">{{s.level}}%</span>
               </div>
-              <div class="contact-details">
-                <h3>Phone</h3>
-                <p>Available upon request</p>
+              <div class="skill-bar">
+                <div class="skill-progress" ng-style="{width: s.level + '%'}"></div>
               </div>
             </div>
           </div>
-          <form id="contact-form" class="contact-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" required>
-              </div>
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="subject">Subject</label>
-              <input type="text" id="subject" name="subject" required>
-            </div>
-            <div class="form-group">
-              <label for="message">Message</label>
-              <textarea id="message" name="message" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-paper-plane"></i>
-              Send Message
-            </button>
-          </form>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
+
+  <!-- Portfolio Section -->
+  <section id="portfolio" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured Projects</h2>
+      </div>
+      <div class="portfolio-grid">
+        <div class="portfolio-item" ng-repeat="project in projects" ng-click="openModal(project)">
+          <div class="portfolio-image">
+            <img
+              ng-src="{{project.image_url ? '/uploads/profile/' + project.image_url : 'https://via.placeholder.com/600x400'}}"
+              alt="{{project.title}}">
+            <div class="portfolio-overlay"><i class="fas fa-plus"></i></div>
+          </div>
+          <div class="portfolio-info">
+            <h3 ng-bind="project.title"></h3>
+            <div class="portfolio-tags">
+              <span ng-repeat="tag in project.tags | limitTo:3" ng-bind="tag"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certifications & Publications -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Certifications & Publications</h2>
+      </div>
+
+      <h3 style="margin-bottom: 1.5rem; color: var(--text-secondary);">Certifications</h3>
+      <div class="certifications-grid" style="margin-bottom: 3rem;">
+        <div class="certification-card" ng-repeat="cert in certifications">
+          <div class="cert-header">
+            <div>
+              <div class="cert-title" ng-bind="cert.name"></div>
+              <div class="cert-issuer" ng-bind="cert.issuer"></div>
+            </div>
+            <i class="fas fa-certificate" style="color: var(--accent-color);" ng-if="cert.type === 'Badge'"></i>
+          </div>
+          <div class="cert-date" ng-bind="cert.date"></div>
+          <div class="cert-badge" ng-if="cert.embed_code" ng-bind-html="trustHtml(cert.embed_code)"></div>
+          <a ng-if="cert.link" ng-href="{{cert.link}}" target="_blank" class="text-sm text-primary hover:underline"
+            style="margin-top: 0.5rem; display: inline-block;">View Certificate <i
+              class="fas fa-external-link-alt"></i></a>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom: 1.5rem; color: var(--text-secondary);">Publications</h3>
+      <div class="publications-list">
+        <div class="publication-item" ng-repeat="pub in publications">
+          <div class="pub-title" ng-bind="pub.title"></div>
+          <div class="pub-publisher" ng-bind="pub.publisher"></div>
+          <div class="pub-date"><i class="far fa-calendar-alt"></i> {{pub.date}}</div>
+          <a ng-if="pub.link" ng-href="{{pub.link}}" target="_blank" class="pub-link">Read Paper <i
+              class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Get In Touch</h2>
+      </div>
+      <div class="contact-content">
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+            <div>
+              <h4>Email</h4>
+              <p ng-bind="personal.email"></p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="fas fa-phone"></i></div>
+            <div>
+              <h4>Phone</h4>
+              <p ng-bind="personal.phone"></p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div>
+              <h4>Location</h4>
+              <p ng-bind="personal.location"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simple Contact Form (Placeholder) -->
+        <form class="contact-form" onsubmit="event.preventDefault(); alert('Message sent (demo)!');">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="Your Email" required>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea rows="5" placeholder="Your Message" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
         <div class="footer-text">
-          <p>&copy; <span id="footer-year">2024</span> <span id="footer-name">Balaji B</span>. All rights reserved.</p>
+          <p>&copy; <span id="footer-year">2024</span> <span ng-bind="personal.name">Balaji B</span>. All rights
+            reserved.</p>
         </div>
         <div class="footer-links">
           <a href="#about">About</a>
-          <a href="#experience">Experience</a>
-          <a href="#skills">Skills</a>
           <a href="#portfolio">Portfolio</a>
           <a href="#contact">Contact</a>
+          <a href="/admin/login.html">Admin</a>
         </div>
       </div>
     </div>
   </footer>
 
   <!-- Portfolio Modal -->
-  <div id="portfolio-modal" class="modal">
-    <div class="modal-content">
-      <span class="modal-close">&times;</span>
-      <div id="modal-body"></div>
-    </div>
-  </div>
-
-  <!-- Portfolio Modal -->
-  <div id="portfolio-modal" class="modal">
-    <div class="modal-content">
-      <span class="modal-close">&times;</span>
-      <div id="modal-body"></div>
+  <div id="portfolio-modal" class="modal" ng-class="{'active': modalVisible}" ng-click="closeModal($event)">
+    <div class="modal-content" ng-click="$event.stopPropagation()">
+      <span class="modal-close" ng-click="closeModal()">&times;</span>
+      <div id="modal-body">
+        <h2 ng-bind="selectedProject.title"></h2>
+        <img
+          ng-src="{{selectedProject.image_url ? '/uploads/profile/' + selectedProject.image_url : 'https://via.placeholder.com/600x400'}}"
+          style="width:100%; border-radius: 8px; margin: 1rem 0;">
+        <p ng-bind="selectedProject.description || 'No description available.'"></p>
+        <div class="portfolio-tags" style="margin-top: 1rem;">
+          <span ng-repeat="tag in selectedProject.tags" ng-bind="tag"></span>
+        </div>
+        <a ng-if="selectedProject.link" ng-href="{{selectedProject.link}}" target="_blank" class="btn btn-primary"
+          style="margin-top: 1rem;">View Project</a>
+      </div>
     </div>
   </div>
 

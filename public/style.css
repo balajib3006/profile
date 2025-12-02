@@ -170,6 +170,14 @@ a {
   display: inline-block;
 }
 
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-only {
+  display: flex !important;
+}
+
 /* Navbar */
 .navbar {
   position: fixed;
@@ -1064,6 +1072,26 @@ a {
     pointer-events: all;
   }
 
+  .nav-link {
+    font-size: 1.2rem;
+    padding: var(--spacing-md);
+    width: 100%;
+    text-align: center;
+    border-radius: var(--radius-md);
+  }
+
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
   .timeline::before {
     left: 20px;
   }
@@ -1093,6 +1121,5 @@ a {
 
   .nav-actions {
     display: none;
-    /* Hide social icons on mobile header to save space */
   }
 }
