@@ -11,6 +11,9 @@ const adminRoutes = require('./routes/admin');
 const indexRoutes = require('./routes/index');
 
 const app = express();
+// Trust proxy (required for Cloudflare/Render to pass correct IP/Protocol)
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -51,7 +54,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
@@ -68,10 +77,7 @@ app.use(session({
 }));
 
 // Request Logging Middleware
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
+
 
 // Routes
 app.use('/api/auth', authRoutes);

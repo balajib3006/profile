@@ -18,7 +18,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure upload directory exists
-const uploadDir = path.join(__dirname, '../public/uploads/profile');
+const uploadDir = path.join(__dirname, '../uploads/profile');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -59,7 +59,8 @@ router.get('/personal-details', (req, res) => {
 router.post('/personal-details', upload.single('profile_picture'), (req, res) => {
     const {
         name, email, phone, location, bio, work_contact,
-        portfolio_url, linkedin_url, github_url, gitlab_url, orcid_url, google_scholar_url
+        portfolio_url, linkedin_url, github_url, gitlab_url, orcid_url, google_scholar_url,
+        remove_picture // Check for this flag
     } = req.body;
 
     // Get existing data to handle profile picture update/retention
@@ -68,8 +69,21 @@ router.post('/personal-details', upload.single('profile_picture'), (req, res) =>
 
         let profile_picture = existingData ? existingData.profile_picture : null;
 
+        // If remove picture flag is set
+        if (remove_picture === 'true') {
+            profile_picture = null;
+            // Delete old image if it exists
+            if (existingData && existingData.profile_picture) {
+                const oldPath = path.join(uploadDir, existingData.profile_picture);
+                if (fs.existsSync(oldPath)) {
+                    fs.unlink(oldPath, (err) => {
+                        if (err) console.error('Error deleting old profile picture:', err);
+                    });
+                }
+            }
+        }
         // If new file uploaded, update profile picture
-        if (req.file) {
+        else if (req.file) {
             profile_picture = req.file.filename;
 
             // Delete old image if it exists
@@ -162,12 +176,28 @@ router.post('/experience/add', (req, res) => {
     );
 });
 
-router.post('/experience/delete/:id', (req, res) => {
+router.put('/experience/edit/:id', (req, res) => {
+    const { title, company, period, responsibilities, location } = req.body;
+    const respArray = responsibilities.split('\n').filter(line => line.trim() !== '');
+
+    db.run(`UPDATE experience SET title = ?, company = ?, period = ?, responsibilities = ?, location = ? WHERE id = ?`,
+        [title, company, period, JSON.stringify(respArray), location, req.params.id],
+        function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            res.json({ success: true });
+        }
+    );
+});
+
+// Support both DELETE (standard) and POST (legacy/fallback)
+const deleteExperienceHandler = (req, res) => {
     db.run("DELETE FROM experience WHERE id = ?", [req.params.id], function (err) {
         if (err) return res.status(500).json({ success: false, message: err.message });
         res.json({ success: true });
     });
-});
+};
+router.delete('/experience/delete/:id', deleteExperienceHandler);
+router.post('/experience/delete/:id', deleteExperienceHandler);
 
 // --- Skills Section ---
 router.get('/skills', (req, res) => {
@@ -188,12 +218,25 @@ router.post('/skills/add', (req, res) => {
     );
 });
 
-router.post('/skills/delete/:id', (req, res) => {
+router.put('/skills/edit/:id', (req, res) => {
+    const { category, name, level } = req.body;
+    db.run(`UPDATE skills SET category = ?, name = ?, level = ? WHERE id = ?`,
+        [category, name, level, req.params.id],
+        function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            res.json({ success: true });
+        }
+    );
+});
+
+const deleteSkillHandler = (req, res) => {
     db.run("DELETE FROM skills WHERE id = ?", [req.params.id], function (err) {
         if (err) return res.status(500).json({ success: false, message: err.message });
         res.json({ success: true });
     });
-});
+};
+router.delete('/skills/delete/:id', deleteSkillHandler);
+router.post('/skills/delete/:id', deleteSkillHandler);
 
 // --- Projects Section ---
 router.get('/projects', (req, res) => {
@@ -223,12 +266,50 @@ router.post('/projects/add', upload.fields([{ name: 'image', maxCount: 1 }, { na
     );
 });
 
-router.post('/projects/delete/:id', (req, res) => {
-    db.run("DELETE FROM projects WHERE id = ?", [req.params.id], function (err) {
-        if (err) return res.status(500).json({ success: false, message: err.message });
-        res.json({ success: true });
+router.put('/projects/edit/:id', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'cad_file', maxCount: 1 }]), (req, res) => {
+    const { title, description, tags } = req.body;
+    const tagsArray = tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '') : [];
+
+    // First get existing data to handle file persistence
+    db.get("SELECT * FROM projects WHERE id = ?", [req.params.id], (err, existingData) => {
+        if (err || !existingData) return res.status(500).json({ success: false, message: err ? err.message : 'Project not found' });
+
+        const image_url = req.files['image'] ? req.files['image'][0].filename : existingData.image_url;
+        const cad_file = req.files['cad_file'] ? req.files['cad_file'][0].filename : existingData.cad_file;
+
+        db.run(`UPDATE projects SET title = ?, description = ?, image_url = ?, tags = ?, cad_file = ? WHERE id = ?`,
+            [title, description, image_url, JSON.stringify(tagsArray), cad_file, req.params.id],
+            function (err) {
+                if (err) return res.status(500).json({ success: false, message: err.message });
+                res.json({ success: true });
+            }
+        );
     });
 });
+
+const deleteProjectHandler = (req, res) => {
+    db.get("SELECT * FROM projects WHERE id = ?", [req.params.id], (err, project) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        if (!project) return res.status(404).json({ success: false, message: "Project not found" });
+
+        // Delete associated files
+        if (project.image_url) {
+            const imagePath = path.join(uploadDir, project.image_url);
+            if (fs.existsSync(imagePath)) fs.unlink(imagePath, err => { if (err) console.error(err); });
+        }
+        if (project.cad_file) {
+            const cadPath = path.join(uploadDir, project.cad_file);
+            if (fs.existsSync(cadPath)) fs.unlink(cadPath, err => { if (err) console.error(err); });
+        }
+
+        db.run("DELETE FROM projects WHERE id = ?", [req.params.id], function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            res.json({ success: true });
+        });
+    });
+};
+router.delete('/projects/delete/:id', deleteProjectHandler);
+router.post('/projects/delete/:id', deleteProjectHandler);
 
 // --- Messages ---
 router.get('/messages', (req, res) => {
@@ -288,12 +369,25 @@ router.post('/certifications/add', (req, res) => {
     );
 });
 
-router.delete('/certifications/delete/:id', (req, res) => {
+router.put('/certifications/edit/:id', (req, res) => {
+    const { name, issuer, date, link, type, embed_code } = req.body;
+    db.run("UPDATE certifications SET name = ?, issuer = ?, date = ?, link = ?, type = ?, embed_code = ? WHERE id = ?",
+        [name, issuer, date, link, type || 'Certification', embed_code, req.params.id],
+        function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            res.json({ success: true });
+        }
+    );
+});
+
+const deleteCertificationHandler = (req, res) => {
     db.run("DELETE FROM certifications WHERE id = ?", [req.params.id], function (err) {
         if (err) return res.status(500).json({ success: false, message: err.message });
         res.json({ success: true });
     });
-});
+};
+router.delete('/certifications/delete/:id', deleteCertificationHandler);
+router.post('/certifications/delete/:id', deleteCertificationHandler);
 
 // --- Publications ---
 router.get('/publications', (req, res) => {
@@ -314,12 +408,25 @@ router.post('/publications/add', (req, res) => {
     );
 });
 
-router.delete('/publications/delete/:id', (req, res) => {
+router.put('/publications/edit/:id', (req, res) => {
+    const { title, publisher, date, link } = req.body;
+    db.run("UPDATE publications SET title = ?, publisher = ?, date = ?, link = ? WHERE id = ?",
+        [title, publisher, date, link, req.params.id],
+        function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            res.json({ success: true });
+        }
+    );
+});
+
+const deletePublicationHandler = (req, res) => {
     db.run("DELETE FROM publications WHERE id = ?", [req.params.id], function (err) {
         if (err) return res.status(500).json({ success: false, message: err.message });
         res.json({ success: true });
     });
-});
+};
+router.delete('/publications/delete/:id', deletePublicationHandler);
+router.post('/publications/delete/:id', deletePublicationHandler);
 
 // --- Notification Settings ---
 router.get('/notification-settings', (req, res) => {

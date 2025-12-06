@@ -89,7 +89,20 @@ app.controller('MainController', ['$scope', '$sce', '$window', 'DataService', fu
       if (data) {
         if (data.about) $scope.about = data.about;
         if (data.experience) {
-          $scope.experience = data.experience;
+          // Sort experience by date descending (Newest first)
+          $scope.experience = data.experience.sort((a, b) => {
+            const getDates = (period) => {
+              if (!period) return new Date();
+              const parts = period.split('-');
+              // Use the end date (second part) or start date if end date is missing/present
+              const dateStr = parts.length > 1 ? parts[1].trim() : parts[0].trim();
+              if (dateStr.toLowerCase() === 'present') return new Date();
+              return new Date(dateStr);
+            };
+            // Sort Descending (b - a)
+            return getDates(b.period) - getDates(a.period);
+          });
+
           if ($scope.experience.length > 0) {
             $scope.currentDesignation = $scope.experience[0].title;
             document.title = `${$scope.personal.name} - ${$scope.currentDesignation}`;
@@ -132,13 +145,25 @@ app.controller('MainController', ['$scope', '$sce', '$window', 'DataService', fu
 // These are kept as vanilla JS classes for performance and simplicity in animation handling
 class ParallaxManager {
   constructor() {
+    this.layers = document.querySelectorAll('.parallax-layer');
+    this.ticking = false;
+
     window.addEventListener('scroll', () => {
-      const scrolled = window.pageYOffset;
-      const layers = document.querySelectorAll('.parallax-layer');
-      layers.forEach((layer, index) => {
-        const speed = (index + 1) * 0.2;
-        layer.style.transform = `translateY(${scrolled * speed}px)`;
-      });
+      if (!this.ticking) {
+        window.requestAnimationFrame(() => {
+          this.updateParallax();
+          this.ticking = false;
+        });
+        this.ticking = true;
+      }
+    });
+  }
+
+  updateParallax() {
+    const scrolled = window.pageYOffset;
+    this.layers.forEach((layer, index) => {
+      const speed = (index + 1) * 0.2;
+      layer.style.transform = `translateY(${scrolled * speed}px)`;
     });
   }
 }
@@ -163,7 +188,7 @@ class ScrollEffectsManager {
     }, { threshold: 0.1 });
 
     // Observe sections and items
-    document.querySelectorAll('section, .timeline-item, .skill-item, .portfolio-item').forEach(el => {
+    document.querySelectorAll('section, .timeline-item, .skill-item, .project-card').forEach(el => {
       el.classList.add('fade-in-up'); // Add base animation class
       observer.observe(el);
     });

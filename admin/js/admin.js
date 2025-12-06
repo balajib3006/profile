@@ -132,6 +132,8 @@ async function loadPersonalDetailsData() {
 
 // Image Preview Handler
 const profileInput = document.getElementById('profile_picture');
+const removePictureBtn = document.getElementById('remove-picture-btn');
+
 if (profileInput) {
     profileInput.addEventListener('change', function (e) {
         const file = e.target.files[0];
@@ -152,9 +154,44 @@ if (profileInput) {
 
                 const fileNameDisplay = document.getElementById('file-name-display');
                 if (fileNameDisplay) fileNameDisplay.textContent = `Selected: ${file.name}`;
+
+                // Show remove button since we have a file selected
+                const imageActions = document.getElementById('image-actions');
+                if (imageActions) imageActions.style.display = 'flex';
+
+                // Reset remove flag
+                const form = document.getElementById('edit-personal-form');
+                if (form) delete form.dataset.removePicture;
             }
             reader.readAsDataURL(file);
         }
+    });
+}
+
+if (removePictureBtn) {
+    removePictureBtn.addEventListener('click', function () {
+        // Reset file input
+        if (profileInput) profileInput.value = '';
+
+        // Reset Preview to placeholder
+        const previewWrapper = document.getElementById('profile-preview-wrapper');
+        if (previewWrapper) {
+            previewWrapper.innerHTML = `
+                <div class="profile-preview-placeholder"><i class="fas fa-user"></i></div>
+            `;
+        }
+
+        // Hide file name
+        const fileNameDisplay = document.getElementById('file-name-display');
+        if (fileNameDisplay) fileNameDisplay.textContent = '';
+
+        // Hide remove button
+        const imageActions = document.getElementById('image-actions');
+        if (imageActions) imageActions.style.display = 'none';
+
+        // Set flag on form to tell backend to remove picture
+        const form = document.getElementById('edit-personal-form');
+        if (form) form.dataset.removePicture = 'true';
     });
 }
 
@@ -170,6 +207,11 @@ if (editPersonalForm) {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
         const formData = new FormData(editPersonalForm);
+
+        // Check if removal flag is set
+        if (editPersonalForm.dataset.removePicture === 'true') {
+            formData.append('remove_picture', 'true');
+        }
 
         // Extract About data to send separately or handle in backend
         // For now, we'll send two requests: one for personal details, one for about
@@ -243,11 +285,14 @@ async function loadAboutData() {
 // About form handler removed as it is merged into personal details
 
 // --- Experience Section ---
+// --- Experience Section ---
 async function loadExperienceData() {
     try {
         const response = await fetch(`${API_BASE_URL}/api/admin/experience`, { credentials: 'include' });
         const data = await response.json();
         const container = document.getElementById('experience-list');
+        // Store data globally for easier access during edit
+        window.experienceData = data;
 
         container.innerHTML = data.map(item => `
             <div class="item-card">
@@ -255,7 +300,10 @@ async function loadExperienceData() {
                     <strong>${item.title}</strong> at ${item.company} <br>
                     <small>${item.location || ''} | ${item.period}</small>
                 </div>
-                <button class="btn btn-danger btn-sm" onclick="deleteExperience(${item.id})">Delete</button>
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="editExperience(${item.id})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteExperience(${item.id})">Delete</button>
+                </div>
             </div>
         `).join('');
     } catch (error) {
@@ -275,9 +323,16 @@ if (addExperienceForm) {
         delete data.start_date;
         delete data.end_date;
 
+        const editingId = addExperienceForm.dataset.editingId;
+        const url = editingId
+            ? `${API_BASE_URL}/api/admin/experience/edit/${editingId}`
+            : `${API_BASE_URL}/api/admin/experience/add`;
+
+        const method = editingId ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/experience/add`, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(data)
@@ -285,21 +340,60 @@ if (addExperienceForm) {
             const result = await response.json();
             if (result.success) {
                 addExperienceForm.reset();
+                delete addExperienceForm.dataset.editingId;
+                addExperienceForm.querySelector('button[type="submit"]').textContent = 'Add Experience';
                 loadExperienceData();
-            } else alert('Error adding experience');
+            } else alert('Error saving experience');
         } catch (error) {
-            console.error('Error adding experience:', error);
+            console.error('Error saving experience:', error);
         }
     });
 }
 
+function editExperience(id) {
+    const item = window.experienceData.find(i => i.id === id);
+    if (!item) return;
+
+    const form = document.getElementById('add-experience-form');
+    form.querySelector('[name="title"]').value = item.title;
+    form.querySelector('[name="company"]').value = item.company;
+    form.querySelector('[name="location"]').value = item.location;
+
+    // Split period back to dates usually "Month Year - Month Year"
+    const dates = item.period.split(' - ');
+    if (dates.length > 0) form.querySelector('[name="start_date"]').value = dates[0].trim();
+    if (dates.length > 1) form.querySelector('[name="end_date"]').value = dates[1].trim();
+
+    // Map responsibilities array back to textarea
+    if (Array.isArray(item.responsibilities)) {
+        form.querySelector('[name="responsibilities"]').value = item.responsibilities.join('\n');
+    }
+
+    form.dataset.editingId = id;
+    form.querySelector('button[type="submit"]').textContent = 'Update Experience';
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
 async function deleteExperience(id) {
-    if (!confirm('Are you sure?')) return;
+    console.log('deleteExperience called with id:', id);
+    // if (!confirm('Are you sure you want to delete this experience?')) return;
+    console.log('Starting fetch...');
     try {
-        await fetch(`/api/admin/experience/delete/${id}`, { method: 'DELETE' });
-        loadExperienceData();
+        const response = await fetch(`${API_BASE_URL}/api/admin/experience/delete/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Result:', result);
+        if (result.success) {
+            loadExperienceData();
+        } else {
+            alert('Failed to delete: ' + (result.message || 'Unknown error'));
+        }
     } catch (error) {
         console.error('Error deleting experience:', error);
+        alert('Error deleting experience: ' + error.message);
     }
 }
 
@@ -309,13 +403,17 @@ async function loadSkillsData() {
         const response = await fetch(`${API_BASE_URL}/api/admin/skills`, { credentials: 'include' });
         const data = await response.json();
         const container = document.getElementById('skills-list');
+        window.skillsData = data;
 
         container.innerHTML = data.map(item => `
             <div class="item-card">
                 <div>
                     <strong>${item.name}</strong> (${item.category}) - ${item.level}%
                 </div>
-                <button class="btn btn-danger btn-sm" onclick="deleteSkill(${item.id})">Delete</button>
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="editSkill(${item.id})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSkill(${item.id})">Delete</button>
+                </div>
             </div>
         `).join('');
     } catch (error) {
@@ -330,9 +428,15 @@ if (addSkillForm) {
         const formData = new FormData(addSkillForm);
         const data = Object.fromEntries(formData.entries());
 
+        const editingId = addSkillForm.dataset.editingId;
+        const url = editingId
+            ? `${API_BASE_URL}/api/admin/skills/edit/${editingId}`
+            : `${API_BASE_URL}/api/admin/skills/add`;
+        const method = editingId ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/skills/add`, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(data)
@@ -340,21 +444,50 @@ if (addSkillForm) {
             const result = await response.json();
             if (result.success) {
                 addSkillForm.reset();
+                delete addSkillForm.dataset.editingId;
+                addSkillForm.querySelector('button[type="submit"]').textContent = 'Add Skill';
                 loadSkillsData();
-            } else alert('Error adding skill');
+            } else alert('Error saving skill');
         } catch (error) {
-            console.error('Error adding skill:', error);
+            console.error('Error saving skill:', error);
         }
     });
 }
 
+function editSkill(id) {
+    const item = window.skillsData.find(i => i.id === id);
+    if (!item) return;
+
+    const form = document.getElementById('add-skill-form');
+    form.querySelector('[name="category"]').value = item.category;
+    form.querySelector('[name="name"]').value = item.name;
+    form.querySelector('[name="level"]').value = item.level;
+
+    form.dataset.editingId = id;
+    form.querySelector('button[type="submit"]').textContent = 'Update Skill';
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
 async function deleteSkill(id) {
-    if (!confirm('Are you sure?')) return;
+    console.log('deleteSkill called with id:', id);
+    // if (!confirm('Are you sure you want to delete this skill?')) return;
+    console.log('Starting fetch...');
     try {
-        await fetch(`/api/admin/skills/delete/${id}`, { method: 'DELETE' });
-        loadSkillsData();
+        const response = await fetch(`${API_BASE_URL}/api/admin/skills/delete/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Result:', result);
+        if (result.success) {
+            loadSkillsData();
+        } else {
+            alert('Failed to delete: ' + (result.message || 'Unknown error'));
+        }
     } catch (error) {
         console.error('Error deleting skill:', error);
+        alert('Error deleting skill: ' + error.message);
     }
 }
 
@@ -364,6 +497,7 @@ async function loadProjectsData() {
         const response = await fetch(`${API_BASE_URL}/api/admin/projects`, { credentials: 'include' });
         const data = await response.json();
         const container = document.getElementById('projects-list');
+        window.projectsData = data;
 
         container.innerHTML = data.map(item => `
             <div class="item-card">
@@ -374,7 +508,10 @@ async function loadProjectsData() {
                         ${item.cad_file ? `<br><small><a href="/uploads/profile/${item.cad_file}" target="_blank">Download CAD</a></small>` : ''}
                     </div>
                 </div>
-                <button class="btn btn-danger btn-sm" onclick="deleteProject(${item.id})">Delete</button>
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="editProject(${item.id})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProject(${item.id})">Delete</button>
+                </div>
             </div>
         `).join('');
     } catch (error) {
@@ -387,31 +524,69 @@ if (addProjectForm) {
     addProjectForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(addProjectForm);
+
+        const editingId = addProjectForm.dataset.editingId;
+        const url = editingId
+            ? `${API_BASE_URL}/api/admin/projects/edit/${editingId}`
+            : `${API_BASE_URL}/api/admin/projects/add`;
+        const method = editingId ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/projects/add`, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 credentials: 'include',
                 body: formData // Send as FormData for file upload
             });
             const result = await response.json();
             if (result.success) {
                 addProjectForm.reset();
+                delete addProjectForm.dataset.editingId;
+                addProjectForm.querySelector('button[type="submit"]').textContent = 'Add Project';
                 loadProjectsData();
-            } else alert('Error adding project: ' + (result.message || 'Unknown error'));
+            } else alert('Error saving project: ' + (result.message || 'Unknown error'));
         } catch (error) {
-            console.error('Error adding project:', error);
-            alert('Error adding project');
+            console.error('Error saving project:', error);
+            alert('Error saving project');
         }
     });
 }
 
+function editProject(id) {
+    const item = window.projectsData.find(i => i.id === id);
+    if (!item) return;
+
+    const form = document.getElementById('add-project-form');
+    form.querySelector('[name="title"]').value = item.title;
+    form.querySelector('[name="description"]').value = item.description;
+    form.querySelector('[name="tags"]').value = Array.isArray(item.tags) ? item.tags.join(', ') : item.tags;
+
+    // Note: Can't populate file inputs logic-wise not supported by browsers, user must re-select if changing
+
+    form.dataset.editingId = id;
+    form.querySelector('button[type="submit"]').textContent = 'Update Project';
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
 async function deleteProject(id) {
-    if (!confirm('Are you sure?')) return;
+    console.log('deleteProject called with id:', id);
+    // if (!confirm('Are you sure you want to delete this project?')) return;
+    console.log('Starting fetch...');
     try {
-        await fetch(`/api/admin/projects/delete/${id}`, { method: 'DELETE' });
-        loadProjectsData();
+        const response = await fetch(`${API_BASE_URL}/api/admin/projects/delete/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Result:', result);
+        if (result.success) {
+            loadProjectsData();
+        } else {
+            alert('Failed to delete: ' + (result.message || 'Unknown error'));
+        }
     } catch (error) {
         console.error('Error deleting project:', error);
+        alert('Error deleting project: ' + error.message);
     }
 }
 
@@ -495,6 +670,7 @@ async function loadCertificationsData() {
         const response = await fetch(`${API_BASE_URL}/api/admin/certifications`, { credentials: 'include' });
         const data = await response.json();
         const container = document.getElementById('certifications-list');
+        window.certificationsData = data;
 
         if (container) {
             container.innerHTML = data.map(item => {
@@ -513,7 +689,10 @@ async function loadCertificationsData() {
                             <small>${item.date} ${item.link ? `| <a href="${item.link}" target="_blank">View</a>` : ''}</small>
                             ${embedDisplay}
                         </div>
-                        <button class="btn btn-danger btn-sm" onclick="deleteCertification(${item.id})">Delete</button>
+                        <div>
+                            <button class="btn btn-secondary btn-sm" onclick="editCertification(${item.id})">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCertification(${item.id})">Delete</button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -530,9 +709,15 @@ if (addCertificationForm) {
         const formData = new FormData(addCertificationForm);
         const data = Object.fromEntries(formData.entries());
 
+        const editingId = addCertificationForm.dataset.editingId;
+        const url = editingId
+            ? `${API_BASE_URL}/api/admin/certifications/edit/${editingId}`
+            : `${API_BASE_URL}/api/admin/certifications/add`;
+        const method = editingId ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/certifications/add`, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(data)
@@ -540,21 +725,53 @@ if (addCertificationForm) {
             const result = await response.json();
             if (result.success) {
                 addCertificationForm.reset();
+                delete addCertificationForm.dataset.editingId;
+                addCertificationForm.querySelector('button[type="submit"]').textContent = 'Add Certification';
                 loadCertificationsData();
-            } else alert('Error adding certification');
+            } else alert('Error saving certification');
         } catch (error) {
             console.error('Error adding certification:', error);
         }
     });
 }
 
+function editCertification(id) {
+    const item = window.certificationsData.find(i => i.id === id);
+    if (!item) return;
+
+    const form = document.getElementById('add-certification-form');
+    form.querySelector('[name="name"]').value = item.name;
+    form.querySelector('[name="issuer"]').value = item.issuer;
+    form.querySelector('[name="date"]').value = item.date;
+    form.querySelector('[name="link"]').value = item.link || '';
+    form.querySelector('[name="type"]').value = item.type;
+    form.querySelector('[name="embed_code"]').value = item.embed_code || '';
+
+    form.dataset.editingId = id;
+    form.querySelector('button[type="submit"]').textContent = 'Update Certification';
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
 async function deleteCertification(id) {
-    if (!confirm('Are you sure?')) return;
+    console.log('deleteCertification called with id:', id);
+    // if (!confirm('Are you sure you want to delete this certification?')) return;
+    console.log('Starting fetch...');
     try {
-        await fetch(`/api/admin/certifications/delete/${id}`, { method: 'DELETE' });
-        loadCertificationsData();
+        const response = await fetch(`${API_BASE_URL}/api/admin/certifications/delete/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Result:', result);
+        if (result.success) {
+            loadCertificationsData();
+        } else {
+            alert('Failed to delete: ' + (result.message || 'Unknown error'));
+        }
     } catch (error) {
         console.error('Error deleting certification:', error);
+        alert('Error deleting certification: ' + error.message);
     }
 }
 
@@ -564,6 +781,7 @@ async function loadPublicationsData() {
         const response = await fetch(`${API_BASE_URL}/api/admin/publications`, { credentials: 'include' });
         const data = await response.json();
         const container = document.getElementById('publications-list');
+        window.publicationsData = data;
 
         if (container) {
             container.innerHTML = data.map(item => `
@@ -572,7 +790,10 @@ async function loadPublicationsData() {
                         <strong>${item.title}</strong> - ${item.publisher}<br>
                         <small>${item.date} ${item.link ? `| <a href="${item.link}" target="_blank">View</a>` : ''}</small>
                     </div>
-                    <button class="btn btn-danger btn-sm" onclick="deletePublication(${item.id})">Delete</button>
+                    <div>
+                        <button class="btn btn-secondary btn-sm" onclick="editPublication(${item.id})">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deletePublication(${item.id})">Delete</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -588,9 +809,15 @@ if (addPublicationForm) {
         const formData = new FormData(addPublicationForm);
         const data = Object.fromEntries(formData.entries());
 
+        const editingId = addPublicationForm.dataset.editingId;
+        const url = editingId
+            ? `${API_BASE_URL}/api/admin/publications/edit/${editingId}`
+            : `${API_BASE_URL}/api/admin/publications/add`;
+        const method = editingId ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/publications/add`, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(data)
@@ -598,20 +825,71 @@ if (addPublicationForm) {
             const result = await response.json();
             if (result.success) {
                 addPublicationForm.reset();
+                delete addPublicationForm.dataset.editingId;
+                addPublicationForm.querySelector('button[type="submit"]').textContent = 'Add Publication';
                 loadPublicationsData();
-            } else alert('Error adding publication');
+            } else alert('Error saving publication');
         } catch (error) {
             console.error('Error adding publication:', error);
         }
     });
 }
 
+function editPublication(id) {
+    const item = window.publicationsData.find(i => i.id === id);
+    if (!item) return;
+
+    const form = document.getElementById('add-publication-form');
+    form.querySelector('[name="title"]').value = item.title;
+    form.querySelector('[name="publisher"]').value = item.publisher;
+    form.querySelector('[name="date"]').value = item.date;
+    form.querySelector('[name="link"]').value = item.link || '';
+
+    form.dataset.editingId = id;
+    form.querySelector('button[type="submit"]').textContent = 'Update Publication';
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
 async function deletePublication(id) {
-    if (!confirm('Are you sure?')) return;
+    console.log('deletePublication called with id:', id);
+    // if (!confirm('Are you sure you want to delete this publication?')) return;
+    console.log('Starting fetch...');
     try {
-        await fetch(`/api/admin/publications/delete/${id}`, { method: 'DELETE' });
-        loadPublicationsData();
+        const response = await fetch(`${API_BASE_URL}/api/admin/publications/delete/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Result:', result);
+        if (result.success) {
+            loadPublicationsData();
+        } else {
+            alert('Failed to delete: ' + (result.message || 'Unknown error'));
+        }
     } catch (error) {
         console.error('Error deleting publication:', error);
+        alert('Error deleting publication: ' + error.message);
     }
 }
+
+// Make functions globally accessible
+window.loadPersonalDetailsData = loadPersonalDetailsData;
+window.loadExperienceData = loadExperienceData;
+window.editExperience = editExperience;
+window.deleteExperience = deleteExperience;
+window.loadSkillsData = loadSkillsData;
+window.editSkill = editSkill;
+window.deleteSkill = deleteSkill;
+window.loadProjectsData = loadProjectsData;
+window.editProject = editProject;
+window.deleteProject = deleteProject;
+window.loadCertificationsData = loadCertificationsData;
+window.editCertification = editCertification;
+window.deleteCertification = deleteCertification;
+window.loadPublicationsData = loadPublicationsData;
+window.editPublication = editPublication;
+window.deletePublication = deletePublication;
+window.loadMessagesData = loadMessagesData;
+window.loadDashboardStats = loadDashboardStats;
+window.checkAuth = checkAuth;

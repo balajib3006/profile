@@ -150,6 +150,7 @@
         <h2 class="section-title">Experience</h2>
       </div>
       <div class="timeline">
+        <div class="empty-state" ng-if="experience.length === 0">No experience details added yet.</div>
         <div class="timeline-item" ng-repeat="item in experience"
           ng-class="{'left': $index % 2 === 0, 'right': $index % 2 !== 0}">
           <div class="timeline-marker"></div>
@@ -179,6 +180,7 @@
         <h2 class="section-title">Technical Skills</h2>
       </div>
       <div class="skills-grid">
+        <div class="empty-state" ng-if="skills.length === 0">No skills added yet.</div>
         <div class="skill-category" ng-repeat="(category, skills) in groupedSkills">
           <h3 class="skill-category-title" ng-bind="category"></h3>
           <div class="skill-list">
@@ -203,18 +205,18 @@
       <div class="section-header">
         <h2 class="section-title">Featured Projects</h2>
       </div>
-      <div class="portfolio-grid">
-        <div class="portfolio-item" ng-repeat="project in projects" ng-click="openModal(project)">
-          <div class="portfolio-image">
-            <img
+      <div class="project-slider-wrapper">
+        <div class="project-slider">
+          <div class="empty-state" ng-if="projects.length === 0" style="width: 100%;">No projects added yet.</div>
+          <div class="project-card" ng-repeat="project in projects" ng-click="openModal(project)">
+            <img class="project-card-image"
               ng-src="{{project.image_url ? '/uploads/profile/' + project.image_url : 'https://via.placeholder.com/600x400'}}"
-              alt="{{project.title}}">
-            <div class="portfolio-overlay"><i class="fas fa-plus"></i></div>
-          </div>
-          <div class="portfolio-info">
-            <h3 ng-bind="project.title"></h3>
-            <div class="portfolio-tags">
-              <span ng-repeat="tag in project.tags | limitTo:3" ng-bind="tag"></span>
+              alt="{{project.title}}" loading="lazy">
+            <div class="project-overlay">
+              <h3 class="project-title" ng-bind="project.title"></h3>
+              <div class="project-tags">
+                <span class="project-tag" ng-repeat="tag in project.tags | limitTo:3" ng-bind="tag"></span>
+              </div>
             </div>
           </div>
         </div>
@@ -231,6 +233,7 @@
 
       <h3 style="margin-bottom: 1.5rem; color: var(--text-secondary);">Certifications</h3>
       <div class="certifications-grid" style="margin-bottom: 3rem;">
+        <div class="empty-state" ng-if="certifications.length === 0">No certifications added yet.</div>
         <div class="certification-card" ng-repeat="cert in certifications">
           <div class="cert-header">
             <div>
@@ -249,6 +252,7 @@
 
       <h3 style="margin-bottom: 1.5rem; color: var(--text-secondary);">Publications</h3>
       <div class="publications-list">
+        <div class="empty-state" ng-if="publications.length === 0">No publications added yet.</div>
         <div class="publication-item" ng-repeat="pub in publications">
           <div class="pub-title" ng-bind="pub.title"></div>
           <div class="pub-publisher" ng-bind="pub.publisher"></div>

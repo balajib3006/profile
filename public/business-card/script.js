@@ -20,7 +20,17 @@ async function loadBusinessCardData() {
       // Extract current job from experience
       let currentJob = { title: '', company: '' };
       if (allData.experience && allData.experience.length > 0) {
-        // Assuming experience is sorted by ID DESC (latest first) as per API
+        // Sort experience by date descending
+        allData.experience.sort((a, b) => {
+          const getDates = (period) => {
+            if (!period) return new Date();
+            const parts = period.split('-');
+            const dateStr = parts.length > 1 ? parts[1].trim() : parts[0].trim();
+            if (dateStr.toLowerCase() === 'present') return new Date();
+            return new Date(dateStr);
+          };
+          return getDates(b.period) - getDates(a.period);
+        });
         currentJob = allData.experience[0];
       }
 
@@ -100,7 +110,7 @@ function generateVCard(data, job) {
 
   // Use job title/company if available, else fallback to bio
   const title = job.title || (data.bio || '').split('\n')[0];
-  const org = job.company || 'Rangsons Aerospace Private Limited'; // Default or fallback
+  const org = job.company || ''; // Use company or empty string
 
   vcardData = `BEGIN:VCARD
 VERSION:3.0
@@ -122,22 +132,32 @@ END:VCARD`;
 function handleContact(e) {
   if (e) e.preventDefault();
 
-  // Check if running on mobile
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (!vcardData) {
+    alert('Contact data is not ready yet. Please try again in a moment.');
+    return;
+  }
 
-  if (isMobile) {
-    // On mobile, try to add to contacts directly
-    const contactUri = `begin:vcard${encodeURIComponent(vcardData.substring(10))}`;
-    window.location.href = `contacts:${contactUri}`;
-  } else {
-    // On desktop, show confirmation dialog
-    if (confirm('Download contact card (vCard)?')) {
-      const blob = new Blob([vcardData], { type: "text/vcard" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `${(document.getElementById('card-name').textContent || 'contact').replace(/\s+/g, '_')}.vcf`;
-      link.click();
-    }
+  // Universal download for both Mobile and Desktop
+  // Modern Android and iOS handle .vcf file downloads effectively
+  try {
+    const blob = new Blob([vcardData], { type: "text/vcard;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+
+    // Generate filename
+    const name = document.getElementById('card-name').textContent || 'contact';
+    const filename = `${name.replace(/\s+/g, '_')}.vcf`;
+
+    link.download = filename;
+    document.body.appendChild(link); // Append to body for Firefox support
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up
+    setTimeout(() => URL.revokeObjectURL(link.href), 100);
+  } catch (err) {
+    console.error('Error saving contact:', err);
+    alert('Could not save contact. Please try sharing instead.');
   }
 }
 

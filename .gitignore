@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Environment Variables & Config
 .env
@@ -8,10 +7,6 @@ package-lock.json
 .env.production
 config.js
 !config.example.js
-
-.env
-.env.local
-.env.production
 
 # Database
 *.db
@@ -48,8 +43,12 @@ tmp/
 temp/
 *.tmp
 
-# Uploads (if using file uploads)
-uploads/
+# Uploads (Keep structure, ignore content)
+uploads/*
+!uploads/.gitkeep
+!uploads/profile/
+uploads/profile/*
+!uploads/profile/.gitkeep
 public/uploads/
 
 # Session data
