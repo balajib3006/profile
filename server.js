@@ -19,12 +19,12 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
 // CORS Configuration
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://profile-warm.onrender.com';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://balajib3006.vercel.app';
 
 // List the known allowed origins here, plus any others you need
 const whitelist = [
     'http://localhost:3000',
-    'https://balajib3006.github.io',
+    'https://balajib3006.vercel.app',
     FRONTEND_URL,
     // add variants if needed:
     // 'https://www.profile-warm.onrender.com'
