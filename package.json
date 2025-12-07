@@ -20,7 +20,7 @@
         "node": ">=18.0.0"
     },
     "dependencies": {
-        "@angular/cli": "^21.0.1",
+        "@angular/cli": "^21.0.2",
         "@vercel/postgres": "^0.10.0",
         "bcrypt": "^5.1.1",
         "cors": "^2.8.5",
