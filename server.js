@@ -99,14 +99,16 @@ app.use((req, res) => {
     res.status(404).send('Not Found');
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log('========================================');
-    console.log(`✅ Server is running on port ${PORT}`);
-    console.log(`✅ Environment: ${NODE_ENV}`);
-    console.log(`✅ CORS Origins: ${process.env.ALLOWED_ORIGINS || 'Development mode (all origins)'}`);
-    console.log('========================================');
-});
+// Start Server (only in local development, not on Vercel)
+if (process.env.VERCEL !== '1') {
+    app.listen(PORT, () => {
+        console.log('========================================');
+        console.log(`✅ Server is running on port ${PORT}`);
+        console.log(`✅ Environment: ${NODE_ENV}`);
+        console.log(`✅ CORS Origins: ${process.env.ALLOWED_ORIGINS || 'Development mode (all origins)'}`);
+        console.log('========================================');
+    });
+}
 
 // Global Error Handlers
 process.on('uncaughtException', (error) => {
@@ -125,3 +127,5 @@ process.on('SIGTERM', () => {
     process.exit(0);
 });
 
+// Export the app for Vercel serverless functions
+module.exports = app;
