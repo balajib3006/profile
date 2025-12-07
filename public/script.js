@@ -1,3 +1,12 @@
+// Vercel Web Analytics - Initialize on page load
+if (typeof window !== 'undefined') {
+  import('@vercel/analytics').then(({ inject }) => {
+    inject();
+  }).catch((err) => {
+    console.warn('Failed to load Vercel Web Analytics:', err);
+  });
+}
+
 // API Configuration
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? '' // development uses relative paths
