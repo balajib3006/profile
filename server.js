@@ -41,6 +41,12 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve admin static files
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
 // Session Setup
 app.use(session({
     secret: process.env.SESSION_SECRET || 'b65d1f215317fc7d4de73d863cb6c5bc73c57793e3f0009c71fd166f4b0d1d03',
@@ -80,6 +86,13 @@ if (process.env.NODE_ENV === 'production') {
 app.use((req, res) => {
     console.log(`404 Not Found: ${req.method} ${req.url}`);
     res.status(404).json({ error: 'Not Found' });
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Open http://localhost:${PORT} in your browser`);
 });
 
 // Export the app for Vercel serverless functions
